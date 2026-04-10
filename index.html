@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>서율이네 가계부</title>
+<link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#1a1125;color:#f0e6f6;font-family:Pretendard,-apple-system,sans-serif;font-size:15px;line-height:1.5;min-height:100dvh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(168,85,247,.08),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(244,114,182,.06),transparent 50%);pointer-events:none;z-index:0}
+.app{max-width:460px;margin:0 auto;padding:12px 14px 100px;position:relative;z-index:1}
+.cd{background:rgba(30,22,46,.85);border:1px solid rgba(168,85,247,.15);border-radius:18px;padding:14px 16px;margin-bottom:10px;backdrop-filter:blur(8px)}
+.cd2{background:rgba(40,30,58,.7);border-radius:14px;padding:10px 12px}
+.cd-glow{border-color:rgba(244,114,182,.25);box-shadow:0 0 20px rgba(244,114,182,.06)}
+button{font-family:inherit;cursor:pointer;border:none;border-radius:14px;font-size:14px;padding:12px 20px;transition:all .12s;-webkit-appearance:none;background:rgba(40,30,58,.8);color:#c4b5d0}
+button:active{transform:scale(.97)}button:disabled{opacity:.3;cursor:default}
+.bm{background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700;width:100%;padding:15px;font-size:16px;box-shadow:0 4px 15px rgba(168,85,247,.25)}
+.bm:disabled{background:rgba(40,30,58,.6);color:#555;box-shadow:none}
+.bm2{background:linear-gradient(135deg,#ec4899,#f43f5e);color:#fff;font-weight:700;width:100%;padding:15px;font-size:16px;box-shadow:0 4px 15px rgba(236,72,153,.2)}
+input[type=text]{background:rgba(40,30,58,.8);border:1px solid rgba(168,85,247,.2);border-radius:12px;color:#f0e6f6;font-family:inherit;font-size:16px;padding:10px 12px;outline:none;-webkit-appearance:none;width:100%}
+input:focus{border-color:#d946ef;box-shadow:0 0 0 3px rgba(217,70,239,.15)}
+input::placeholder{color:rgba(168,130,200,.35)}
+.xpb{height:6px;background:rgba(40,30,58,.8);border-radius:3px;overflow:hidden}.xpf{height:100%;border-radius:3px;background:linear-gradient(90deg,#a855f7,#ec4899);transition:width .5s}
+.hpb{height:14px;background:rgba(20,14,32,.8);border-radius:7px;overflow:hidden;border:1px solid rgba(168,85,247,.15)}.hpf{height:100%;border-radius:7px;transition:width .4s}
+.badge{display:inline-block;font-size:11px;padding:3px 10px;border-radius:99px;font-weight:700}
+.glow{filter:drop-shadow(0 0 10px rgba(217,70,239,.4))}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-50px) scale(1.4)}}
+@keyframes pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes twinkle{0%,100%{opacity:.3}50%{opacity:1}}
+.pop{animation:pop .25s ease}
+.star{position:fixed;width:2px;height:2px;background:#fff;border-radius:50%;animation:twinkle 3s infinite;z-index:0;pointer-events:none}
+.nb{position:fixed;bottom:0;left:0;right:0;background:rgba(26,17,37,.95);border-top:1px solid rgba(168,85,247,.15);display:flex;justify-content:center;gap:6px;padding:10px 14px;z-index:100;backdrop-filter:blur(10px)}
+.nb button{flex:1;max-width:100px;padding:10px 6px;font-size:11px;font-weight:600;border:1px solid rgba(168,85,247,.12);border-radius:12px}
+.nb .on{background:rgba(168,85,247,.12);color:#d8b4fe;border-color:rgba(168,85,247,.3)}
+.row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid rgba(168,85,247,.08)}.row:last-child{border-bottom:none}
+.sg{display:grid;gap:6px;margin-bottom:12px}.sg2{grid-template-columns:repeat(2,1fr)}.sg3{grid-template-columns:repeat(3,1fr)}.sg4{grid-template-columns:repeat(4,1fr)}
+.sb{background:rgba(40,30,58,.6);border-radius:12px;padding:10px;text-align:center;border:1px solid rgba(168,85,247,.08)}.sb .l{font-size:10px;color:#a78bbc}.sb .v{font-size:17px;font-weight:700;margin-top:2px}
+.mn{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:12px}
+.mn button{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;border:1px solid rgba(168,85,247,.2)}
+.tag{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;display:inline-block}.title{text-align:center;margin-bottom:14px}
+.title h1{font-size:26px;font-weight:800;background:linear-gradient(135deg,#e879f9,#f9a8d4,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.title .sub{font-size:11px;color:#a78bbc;margin-top:2px}
+.irow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(168,85,247,.08)}.irow:last-child{border-bottom:none}
+.pl{font-size:11px;color:#a78bbc;background:rgba(168,85,247,.08);padding:2px 10px;border-radius:99px;display:inline-block}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div class="app" id="app"></div>
+<script>
+(function(){for(var i=0;i<40;i++){var s=document.createElement('div');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=Math.random()*5+'s';s.style.animationDuration=(2+Math.random()*4)+'s';document.getElementById('stars').appendChild(s);}})();
+var SK='syul4',D={},S={scr:'daily',per:0,di:0,oc:null,bat:null};
+var PD=12,DIM=[31,28,31,30,31,30,31,31,30,31,30,31],MN=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+var fmt=function(n){return Math.round(n).toLocaleString('ko-KR')};
+function pLen(p){return(DIM[p]-PD+1)+(PD-1);}
+function pDate(p,i){var d1=DIM[p]-PD+1;if(i<d1)return{m:p,d:PD+i};return{m:(p+1)%12,d:i-d1+1};}
+function pLbl(p){return MN[p]+' 급여';}
+function pRng(p){return MN[p]+' '+PD+'일~'+MN[(p+1)%12]+' '+(PD-1)+'일';}
+function d2p(m,d){if(d>=PD)return{p:m,i:d-PD};var pm=(m-1+12)%12;return{p:pm,i:(DIM[pm]-PD+1)+(d-1)};}
+function todayP(){var n=new Date();return d2p(n.getMonth(),n.getDate());}
+function dFull(m,d){return MN[m]+' '+d+'일';}
+function dShort(m,d){return(m+1)+'/'+d;}
+(function(){var t=todayP();S.per=t.p;S.di=t.i;})();
+var DI=[{id:'sal_m',n:'마스터 월급',v:3300000},{id:'sal_j',n:'지은 월급',v:1600000},{id:'bonus',n:'상여금',v:1000000},{id:'gov',n:'부모급여',v:500000},{id:'child',n:'아동수당',v:100000}];
+var DF=[{id:'loan',n:'대출이자',v:556000},{id:'ins_m',n:'보험(마스터)',v:300000},{id:'ins_j',n:'보험(지은)',v:245000},{id:'ins_p',n:'보험(부모님)',v:200000},{id:'install_m',n:'할부(마스터)',v:174000},{id:'install_j',n:'할부(지은)',v:0},{id:'apt',n:'관리비',v:220000},{id:'comm_m',n:'통신비(마스터)',v:29000},{id:'comm_j',n:'통신비(지은)',v:17600},{id:'water',n:'정수기',v:20000},{id:'allow_m',n:'용돈(마스터)',v:450000},{id:'allow_j',n:'용돈(지은)',v:200000},{id:'social_m',n:'모임비(마스터)',v:60000},{id:'social_j',n:'모임비(지은)',v:30000}];
+var DS=[{id:'sav_j',n:'지은 적금',v:700000},{id:'etf',n:'ETF적립',v:400000},{id:'trade',n:'트레이딩',v:300000},{id:'emerg',n:'비상금',v:300000},{id:'travel',n:'여행비',v:50000}];
+var CKW={'식비':['밥','식사','점심','저녁','아침','배달','요기요','배민','쿠팡이츠','식당','라면','김밥','떡볶이','치킨','피자','햄버거','카페','커피','음료','빵','편의점','마트','장보기','반찬','식재료','과일','야채','고기','수산','국','찌개','분식'],'교통':['기름','주유','톨게이트','주차','택시','버스','지하철','교통','세차','충전','하이패스'],'육아':['분유','기저귀','물티슈','이유식','아기','유아','장난감','어린이','소아과','예방접종','아기옷','유모차','젖병','카시트','서율'],'쇼핑':['옷','신발','가방','쇼핑','의류','화장품','선물','택배','쿠팡'],'의료':['약국','병원','치과','안과','피부과','한의원','약','진료'],'문화':['영화','공연','책','게임','넷플릭스','유튜브','구독','운동','헬스'],'생활':['관리비','전기','가스','수도','세탁','청소','생필품','다이소','세제','휴지'],'모임':['회식','경조사','축의금','조의금','모임','술','맥주','소주','와인']};
+function catOf(n){n=n.toLowerCase();for(var c in CKW)for(var i=0;i<CKW[c].length;i++)if(n.indexOf(CKW[c][i])>=0)return c;return'기타';}
+var CC={'식비':'#f472b6','교통':'#818cf8','육아':'#fbbf24','쇼핑':'#f0abfc','의료':'#34d399','문화':'#c084fc','생활':'#fb923c','모임':'#22d3ee','기타':'#a78bbc'};
+var CE={'식비':'🍽','교통':'🚗','육아':'👶','쇼핑':'🛍','의료':'💊','문화':'🎬','생활':'🏠','모임':'🥂','기타':'📌'};
+var MONS=[{name:'슬라임',hp:50,svg:'<circle cx="50" cy="55" r="32" fill="#f9a8d4"/><circle cx="38" cy="48" r="5" fill="#fff"/><circle cx="62" cy="48" r="5" fill="#fff"/><circle cx="40" cy="49" r="2.5" fill="#1a1125"/><circle cx="64" cy="49" r="2.5" fill="#1a1125"/><path d="M40 64Q50 70 60 64" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>'},{name:'고블린',hp:65,svg:'<ellipse cx="50" cy="55" rx="30" ry="32" fill="#c084fc"/><polygon points="32,28 38,45 26,42" fill="#c084fc"/><polygon points="68,28 74,42 62,45" fill="#c084fc"/><circle cx="40" cy="50" r="5" fill="#fff"/><circle cx="60" cy="50" r="5" fill="#fff"/><circle cx="41" cy="51" r="2.5" fill="#1a1125"/><circle cx="61" cy="51" r="2.5" fill="#1a1125"/>'},{name:'드래곤',hp:90,svg:'<ellipse cx="50" cy="55" rx="36" ry="32" fill="#a78bfa"/><polygon points="22,30 14,10 36,35" fill="#a78bfa"/><polygon points="78,30 86,10 64,35" fill="#a78bfa"/><circle cx="38" cy="48" r="6" fill="#fff"/><circle cx="62" cy="48" r="6" fill="#fff"/><circle cx="39" cy="49" r="3" fill="#1a1125"/><circle cx="63" cy="49" r="3" fill="#1a1125"/><path d="M38 66Q50 74 62 66" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>'},{name:'유령',hp:45,svg:'<path d="M50 18C28 18 20 38 20 55Q20 75 28 80L34 74 40 80 46 74 50 80 54 74 60 80 66 74 72 80Q80 75 80 55C80 38 72 18 50 18Z" fill="#e879f9"/><circle cx="40" cy="45" r="5" fill="#fff"/><circle cx="60" cy="45" r="5" fill="#fff"/><circle cx="41" cy="46" r="2.5" fill="#1a1125"/><circle cx="61" cy="46" r="2.5" fill="#1a1125"/><ellipse cx="50" cy="60" rx="5" ry="6" fill="#1a1125"/>'},{name:'오크',hp:75,svg:'<ellipse cx="50" cy="55" rx="34" ry="32" fill="#fb923c"/><rect x="32" y="38" width="36" height="8" rx="3" fill="#7c2d12"/><circle cx="40" cy="48" r="5" fill="#fff"/><circle cx="60" cy="48" r="5" fill="#fff"/><circle cx="41" cy="49" r="2.5" fill="#1a1125"/><circle cx="61" cy="49" r="2.5" fill="#1a1125"/>'}];
+var BOSS={name:'마왕 낭비',hp:300,svg:'<ellipse cx="50" cy="50" rx="40" ry="38" fill="#be185d"/><polygon points="22,22 12,2 36,28" fill="#be185d"/><polygon points="78,22 88,2 64,28" fill="#be185d"/><circle cx="38" cy="42" r="7" fill="#fbbf24"/><circle cx="62" cy="42" r="7" fill="#fbbf24"/><circle cx="39" cy="43" r="3.5" fill="#1a1125"/><circle cx="63" cy="43" r="3.5" fill="#1a1125"/><path d="M36 62Q50 72 64 62" stroke="#fbbf24" stroke-width="3" fill="none" stroke-linecap="round"/>'};
+function hSvg(s){return'<svg viewBox="0 0 100 120" width="'+s+'" height="'+(s*1.2)+'" class="glow"><circle cx="50" cy="26" r="18" fill="#f9a8d4"/><path d="M32 18L38 8L44 16L50 6L56 16L62 8L68 18" stroke="#fbbf24" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="42" cy="26" r="3" fill="#fff"/><circle cx="58" cy="26" r="3" fill="#fff"/><circle cx="43" cy="27" r="1.5" fill="#1a1125"/><circle cx="59" cy="27" r="1.5" fill="#1a1125"/><path d="M45 33Q50 36 55 33" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round"/><rect x="38" y="44" width="24" height="28" rx="6" fill="#f9a8d4"/><line x1="76" y1="42" x2="86" y2="28" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/><polygon points="86,22 82,32 90,32" fill="#fbbf24"/><rect x="38" y="72" width="10" height="18" rx="4" fill="#d946ef"/><rect x="52" y="72" width="10" height="18" rx="4" fill="#d946ef"/></svg>';}
+var LVS=[{l:1,n:'견습 공주',a:10,x:0},{l:2,n:'절약 공주',a:18,x:500},{l:3,n:'저축 기사',a:28,x:1500},{l:4,n:'투자 마법사',a:40,x:3000},{l:5,n:'자산 여왕',a:55,x:5500},{l:6,n:'전설의 부자',a:75,x:9000}];
+function gL(x){for(var i=LVS.length-1;i>=0;i--)if(x>=LVS[i].x)return LVS[i];return LVS[0];}
+function nL(x){for(var i=0;i<LVS.length;i++)if(LVS[i].x>x)return LVS[i];return null;}
+function xp(){var x=0;for(var p in D){var o=D[p];if(!o||!o.days)continue;for(var d in o.days){if(o.days[d].bt)x+=20;if(o.days[d].rw>0)x+=Math.min(50,Math.round(o.days[d].rw/100));}if(o.mb)x+=200;}return x;}
+function iP(){return{inc:{},fix:{},sav:{},days:{},rb:0,mb:false,mr:0};}
+function gP(p){if(!D[p])D[p]=iP();return D[p];}
+function gDy(p,i){var o=gP(p);if(!o.days[i])o.days[i]={items:[],bt:false,rw:0};return o.days[i];}
+function load(){try{var s=localStorage.getItem(SK);if(s)D=JSON.parse(s);else D={};}catch(e){D={};}}
+function sv(){try{localStorage.setItem(SK,JSON.stringify(D));}catch(e){}}
+function pI(p){var o=gP(p),t=0;DI.forEach(function(x){t+=Number(o.inc[x.id]||x.v)||0;});return t;}
+function pF(p){var o=gP(p),t=0;DF.forEach(function(x){t+=Number(o.fix[x.id]||x.v)||0;});return t;}
+function pS(p){var o=gP(p),t=0;DS.forEach(function(x){t+=Number(o.sav[x.id]||x.v)||0;});return t;}
+function pB(p){return Math.max(0,pI(p)-pF(p)-pS(p));}
+function dB(p){return Math.round(pB(p)/pLen(p));}
+function dSp(p,i){return gDy(p,i).items.reduce(function(s,x){return s+x.amount},0);}
+function dR(p,i){var tot=pB(p),sp=0,o=gP(p);for(var j=0;j<i;j++)sp+=((o.days[j]||{}).items||[]).reduce(function(s,x){return s+x.amount},0);return Math.max(0,Math.round((tot-sp)/Math.max(1,pLen(p)-i)));}
+function pSp(p){var o=gP(p),t=0;for(var d in o.days)t+=((o.days[d]||{}).items||[]).reduce(function(s,x){return s+x.amount},0);return t;}
+function pBd(p){var o=gP(p),n=0;for(var d in o.days)if(o.days[d].bt)n++;return n;}
+function pCats(p){var o=gP(p),c={};for(var d in o.days)(o.days[d].items||[]).forEach(function(x){c[x.cat]=(c[x.cat]||0)+x.amount;});return c;}
+function sMF(t,id,v){gP(S.per)[t][id]=v;sv();R();}
+function gMF(t,id,def){var o=gP(S.per);return(o[t]&&o[t][id]!==undefined&&o[t][id]!=='')?o[t][id]:def;}
+function cRw(sp,bg){if(sp===0&&bg>0)return Math.round(bg*.08);var s=bg-sp;if(s<=0)return 0;var r=s/bg;if(r>=.5)return Math.round(s*.1);if(r>=.3)return Math.round(s*.07);if(r>=.1)return Math.round(s*.05);return Math.round(s*.03);}
+function addI(){var nm=document.getElementById('i_nm').value.trim(),am=Number(document.getElementById('i_am').value.replace(/,/g,''));if(!nm||!am)return;gDy(S.per,S.di).items.push({name:nm,amount:am,cat:catOf(nm),time:new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})});sv();R();}
+function rmI(i){gDy(S.per,S.di).items.splice(i,1);sv();R();}
+function rstD(){if(!confirm('이 날 결산을 초기화할까요? 보상금도 차감됩니다.'))return;var d=gDy(S.per,S.di),o=gP(S.per);o.rb=Math.max(0,(o.rb||0)-(d.rw||0));d.bt=false;d.rw=0;sv();R();}
+function clm(){var o=gP(S.per),b=o.rb||0;if(b<=0)return;alert('축하합니다! '+fmt(b)+'원 보상금 수령!');o.rb=0;sv();R();}
+function chD(delta){var ni=S.di+delta;if(ni<0){S.per=(S.per-1+12)%12;ni=pLen(S.per)-1;}else if(ni>=pLen(S.per)){S.per=(S.per+1)%12;ni=0;}S.di=ni;R();}
+function doB(){
+  var sp=dSp(S.per,S.di),db=dR(S.per,S.di),lv=gL(xp()),sv2=db-sp,r=db>0?sv2/db:0,hits=[],mon=MONS[(S.per*31+S.di)%MONS.length];
+  if(sp===0)hits.push({n:'무지출!',d:lv.a*5,m:'PERFECT 💖',c:true});
+  else if(r>=.5)hits.push({n:'대절약!',d:lv.a*3,m:'CRITICAL 💫',c:true});
+  else if(r>=.2)hits.push({n:'절약 성공',d:lv.a*2,m:'GREAT ✨',c:true});
+  else if(r>=0)hits.push({n:'목표 달성',d:lv.a,m:'HIT',c:false});
+  else hits.push({n:'초과 지출',d:Math.round(lv.a*.3),m:'WEAK',c:false});
+  var cats={};gDy(S.per,S.di).items.forEach(function(x){cats[x.cat]=(cats[x.cat]||0)+x.amount;});
+  if(Object.keys(cats).length>=3)hits.push({n:'분산 소비',d:lv.a,m:'BONUS ⭐',c:true});
+  S.bat={mon:mon,hp:mon.hp,mhp:mon.hp,hits:hits,shown:[],ph:'ready',shk:false,hn:null,rw:cRw(sp,db)};S.scr='battle';R();}
+function exB(){S.bat.ph='fighting';R();var idx=0,b=S.bat;function go(){if(idx>=b.hits.length){b.ph='done';R();return;}var h=b.hits[idx];b.hp=Math.max(0,b.hp-h.d);b.shown.push(h);b.shk=true;b.hn=h.d;R();setTimeout(function(){b.shk=false;b.hn=null;R();},350);idx++;setTimeout(go,750);}setTimeout(go,500);}
+function fDB(){var d=gDy(S.per,S.di);d.bt=true;d.rw=S.bat.rw;gP(S.per).rb=(gP(S.per).rb||0)+S.bat.rw;sv();S.bat=null;S.scr='daily';R();}
+function doMB(){
+  var sp=pSp(S.per),bg=pB(S.per),sv2=bg-sp,lv=gL(xp()),hits=[],bd=pBd(S.per);
+  if(bg>0&&sv2/bg>=.3)hits.push({n:'대절약!',d:lv.a*5,m:'PERFECT 💖',c:true});
+  else if(bg>0&&sv2/bg>=.15)hits.push({n:'절약 성공',d:lv.a*3,m:'CRITICAL 💫',c:true});
+  else if(sv2>=0)hits.push({n:'예산 내',d:lv.a*2,m:'GREAT ✨',c:true});
+  else hits.push({n:'초과',d:lv.a,m:'HIT',c:false});
+  if(bd>=25)hits.push({n:'성실('+bd+'일)',d:lv.a*4,m:'LEGENDARY 👑',c:true});
+  else if(bd>=15)hits.push({n:'꾸준('+bd+'일)',d:lv.a*2,m:'GREAT ✨',c:true});
+  else hits.push({n:'기록 '+bd+'일',d:lv.a,m:'HIT',c:false});
+  var cats=pCats(S.per),ca=[];for(var c in cats)ca.push({n:c,a:cats[c]});ca.sort(function(a,b){return b.a-a.a});
+  if(ca.length>0&&ca[0].a<bg*.35)hits.push({n:'균형 소비',d:lv.a*2,m:'BONUS ⭐',c:true});
+  var mrw=sv2>0?Math.round(sv2*.05):0;if(bd>=25)mrw=Math.round(mrw*1.5);
+  S.bat={mon:BOSS,hp:BOSS.hp,mhp:BOSS.hp,hits:hits,shown:[],ph:'ready',shk:false,hn:null,rw:mrw,isM:true};S.scr='battle';R();}
+function fMB(){var o=gP(S.per);o.mb=true;o.mr=S.bat.rw;o.rb=(o.rb||0)+S.bat.rw;sv();S.bat=null;S.scr='month';R();}
+// === RENDER ===
+function rDaily(){
+  var p=S.per,i=S.di,dy=gDy(p,i),dt=pDate(p,i),sp=dSp(p,i),db=dR(p,i),dbB=dB(p),sv2=db-sp,rw=cRw(sp,db);
+  var x2=xp(),lv=gL(x2),nl=nL(x2),o=gP(p),bank=o.rb||0;
+  var h='<div class="title"><h1>👑 서율이네</h1><div class="sub">우리 가족 가계부 퀘스트</div></div>';
+  h+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">'+hSvg(38)+'<div style="flex:1"><div style="font-size:15px;font-weight:700">Lv.'+lv.l+' '+lv.n+'</div><div style="font-size:11px;color:#a78bbc">XP '+x2+(nl?' / '+nl.x:' MAX')+' · ATK '+lv.a+'</div><div class="xpb" style="margin-top:4px"><div class="xpf" style="width:'+(nl?Math.min(100,(x2-lv.x)/(nl.x-lv.x)*100):100)+'%"></div></div></div></div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0 4px"><div class="mn" style="margin:0"><button onclick="chD(-1)"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M10 3L5 8L10 13" stroke="#a78bbc" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button><div style="text-align:center"><div style="font-size:18px;font-weight:800">'+dFull(dt.m,dt.d)+'</div></div><button onclick="chD(1)"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M6 3L11 8L6 13" stroke="#a78bbc" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button></div>'+(dy.bt?'<span class="badge" style="background:rgba(52,211,153,.1);color:#34d399">CLEAR ✓</span>':'')+'</div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><span class="pl">'+pLbl(p)+' · '+(i+1)+'/'+pLen(p)+'일차</span><span style="font-size:11px;color:#555a6e">'+pRng(p)+'</span></div>';
+  h+='<div class="sg sg3"><div class="sb"><div class="l">오늘 예산</div><div class="v" style="color:#d8b4fe">'+fmt(db)+'</div>'+(db!==dbB?'<div style="font-size:10px;color:'+(db<dbB?'#f472b6':'#34d399')+'">기준 '+fmt(dbB)+'</div>':'')+'</div><div class="sb"><div class="l">오늘 지출</div><div class="v" style="color:'+(sp>db?'#f472b6':'#f0e6f6')+'">'+fmt(sp)+'</div></div><div class="sb" style="border-color:'+(sv2>=0?'rgba(52,211,153,.2)':'rgba(244,114,182,.2)')+'"><div class="l">'+(sv2>=0?'절약':'초과')+'</div><div class="v" style="color:'+(sv2>=0?'#34d399':'#f472b6')+'">'+fmt(Math.abs(sv2))+'</div></div></div>';
+  h+='<div class="cd cd-glow" style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:11px;color:#a78bbc">💰 누적 보상금</div><div style="font-size:22px;font-weight:800;color:#fbbf24">'+fmt(bank)+'<span style="font-size:13px">원</span></div></div><button onclick="clm()" '+(bank>0?'':'disabled')+' style="padding:10px 18px;font-weight:700;border-radius:99px;'+(bank>0?'background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#1a1125':'')+'">수령하기</button></div>';
+  if(sv2>0&&!dy.bt)h+='<div class="cd2" style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:#a78bbc">✨ 예상 보상금</span><span style="font-size:16px;font-weight:700;color:#34d399">+'+fmt(rw)+'원</span></div>';
+  if(!dy.bt)h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:10px">📝 지출 입력</div><div style="display:flex;gap:8px"><input type="text" id="i_nm" placeholder="항목명 (점심, 기저귀...)" style="flex:1.3"><input type="text" id="i_am" inputmode="numeric" placeholder="금액" style="flex:.7;text-align:right"><button onclick="addI()" style="padding:10px 16px;background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700;flex-shrink:0;border-radius:12px">+</button></div></div>';
+  if(dy.items.length>0){h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:8px">📋 오늘 내역</div>';dy.items.forEach(function(it,idx){var cc=CC[it.cat]||'#a78bbc';h+='<div class="row pop"><div style="font-size:16px;width:24px;text-align:center">'+(CE[it.cat]||'📌')+'</div><div style="flex:1"><div style="font-size:14px">'+it.name+' <span class="tag" style="background:'+cc+'20;color:'+cc+'">'+it.cat+'</span></div><div style="font-size:11px;color:#555a6e">'+(it.time||'')+'</div></div><div style="font-size:15px;font-weight:700;font-family:monospace">'+fmt(it.amount)+'</div>';if(!dy.bt)h+='<button onclick="rmI('+idx+')" style="padding:4px 8px;font-size:11px;color:#f472b6;background:rgba(244,114,182,.1);border-radius:8px">✕</button>';h+='</div>';});h+='</div>';}
+  if(dy.bt)h+='<div style="display:flex;gap:8px"><button class="bm" style="flex:1" disabled>✓ 결산 완료</button><button onclick="rstD()" style="padding:14px 20px;background:rgba(244,114,182,.1);color:#f472b6;border:1px solid rgba(244,114,182,.15);font-weight:700">초기화</button></div>';
+  else h+='<button class="bm2" onclick="doB()">⚔️ '+(dy.items.length===0?'무지출 배틀!':'오늘 결산 배틀')+'</button>';
+  return h;}
+function rBattle(){
+  var b=S.bat;if(!b)return'';var lv=gL(xp()),hpp=Math.max(0,b.hp/b.mhp*100),hpc=hpp>50?'#f472b6':hpp>20?'#fbbf24':'#881337';
+  var h='<div style="text-align:center;margin-bottom:8px"><div style="font-size:12px;color:#a78bbc">'+(b.isM?pLbl(S.per)+' 보스전':'오늘의 배틀')+'</div><div style="font-size:22px;font-weight:800;margin-top:4px">⚔️ VS '+b.mon.name+'</div></div>';
+  h+='<div style="display:flex;justify-content:space-around;align-items:flex-end;padding:14px 0;margin-bottom:14px"><div style="text-align:center">'+hSvg(50)+'<div style="font-size:12px;font-weight:700;margin-top:4px">Lv.'+lv.l+'</div></div><div style="font-size:26px;font-weight:800;color:#d946ef;align-self:center">VS</div><div style="text-align:center;position:relative"><svg viewBox="0 0 100 100" width="'+(b.isM?105:85)+'" height="'+(b.isM?105:85)+'" style="'+(b.shk?'animation:shake .3s;':'')+(b.hp<=0?'opacity:.2;':'')+'">'+b.mon.svg;
+  if(b.hp<=0)h+='<line x1="30" y1="38" x2="44" y2="52" stroke="#fff" stroke-width="4"/><line x1="44" y1="38" x2="30" y2="52" stroke="#fff" stroke-width="4"/><line x1="56" y1="38" x2="70" y2="52" stroke="#fff" stroke-width="4"/><line x1="70" y1="38" x2="56" y2="52" stroke="#fff" stroke-width="4"/>';
+  h+='</svg>';if(b.hn)h+='<div style="position:absolute;top:-14px;right:0;font-size:26px;font-weight:800;color:#f472b6;font-family:monospace;animation:floatUp .8s forwards">-'+b.hn+'</div>';
+  h+='<div style="font-size:13px;font-weight:700;margin-top:4px">'+b.mon.name+'</div><div class="hpb" style="width:130px;margin:6px auto 0"><div class="hpf" style="width:'+hpp+'%;background:'+hpc+'"></div></div><div style="font-size:11px;color:#a78bbc;margin-top:3px">HP '+Math.max(0,Math.round(b.hp))+'/'+b.mhp+'</div></div></div>';
+  if(b.ph==='ready')h+='<button class="bm2" onclick="exB()">⚔️ 공격!</button>';
+  if(b.ph==='fighting'||b.ph==='done'){h+='<div style="margin-bottom:14px">';b.shown.forEach(function(hi){h+='<div class="pop" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;margin-bottom:4px;border-radius:12px;background:'+(hi.c?'rgba(217,70,239,.08)':'rgba(168,130,200,.05)')+';border:1px solid '+(hi.c?'rgba(217,70,239,.15)':'rgba(168,85,247,.1)')+'"><span style="font-size:13px">'+hi.n+'</span><span style="font-size:13px;font-weight:700"><span class="badge" style="background:'+(hi.c?'rgba(52,211,153,.12)':'rgba(168,130,200,.1)')+';color:'+(hi.c?'#34d399':'#a78bbc')+'">'+hi.m+'</span> <span style="font-family:monospace;color:'+(hi.c?'#34d399':'#a78bbc')+'">-'+hi.d+'</span></span></div>';});h+='</div>';}
+  if(b.ph==='done'){var w=b.hp<=0;h+='<div class="cd" style="text-align:center;border-color:'+(w?'rgba(52,211,153,.2)':'rgba(251,191,36,.2)')+'"><div style="font-size:20px;color:#fbbf24;letter-spacing:3px">'+(w?'★★★':b.hp<=b.mhp*.3?'★★☆':'★☆☆')+'</div><div style="font-size:28px;font-weight:800;color:'+(w?'#34d399':'#fbbf24')+';margin:8px 0">'+(w?'VICTORY! 👑':'GOOD! ✨')+'</div><div style="font-size:16px;margin-top:6px">보상금 <span style="font-weight:800;color:#fbbf24;font-size:24px">+'+fmt(b.rw)+'원</span></div></div><button class="bm" onclick="'+(b.isM?'fMB()':'fDB()')+'">확인</button>';}return h;}
+function rMonth(){
+  var p=S.per,o=gP(p),sp=pSp(p),bg=pB(p),sv2=bg-sp,bank=o.rb||0,bd=pBd(p),td=pLen(p);
+  var h='<div class="title"><h1>👑 서율이네</h1><div class="sub">'+pLbl(p)+' 관리</div></div>';
+  h+='<div class="mn"><button onclick="S.per=(S.per-1+12)%12;R()"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M10 3L5 8L10 13" stroke="#a78bbc" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button><div style="text-align:center"><div style="font-size:20px;font-weight:800">'+pLbl(p)+(o.mb?' <span class="badge" style="background:rgba(52,211,153,.1);color:#34d399">CLEAR</span>':'')+'</div><div style="font-size:11px;color:#555a6e">'+pRng(p)+'</div></div><button onclick="S.per=(S.per+1)%12;R()"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M6 3L11 8L6 13" stroke="#a78bbc" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button></div>';
+  h+='<div class="cd cd-glow" style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:11px;color:#a78bbc">💰 누적 보상금</div><div style="font-size:22px;font-weight:800;color:#fbbf24">'+fmt(bank)+'<span style="font-size:13px">원</span></div></div><button onclick="clm()" '+(bank>0?'':'disabled')+' style="padding:10px 18px;font-weight:700;border-radius:99px;'+(bank>0?'background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#1a1125':'')+'">수령하기</button></div>';
+  [{k:'inc',i:'💵',l:'수입',t:pI(p),items:DI,c:'#d8b4fe'},{k:'fix',i:'⚡',l:'고정 지출',t:pF(p),items:DF,c:'#f472b6'},{k:'sav',i:'💎',l:'저축/투자',t:pS(p),items:DS,c:'#34d399'}].forEach(function(sec){
+    var isO=S.oc===sec.k;
+    h+='<div class="cd" style="padding:0;overflow:hidden"><div onclick="S.oc=S.oc===\''+sec.k+'\'?null:\''+sec.k+'\';R()" style="padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:10px"><div style="font-size:18px">'+sec.i+'</div><div style="flex:1"><div style="font-size:14px;font-weight:700">'+sec.l+'</div><div style="font-size:12px;color:'+sec.c+'">'+fmt(sec.t)+'원</div></div><svg width="14" height="14" viewBox="0 0 16 16" style="transform:rotate('+(isO?180:0)+'deg);transition:.2s"><path d="M4 6L8 10L12 6" stroke="#a78bbc" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>';
+    if(isO){h+='<div style="padding:0 16px 14px;border-top:1px solid rgba(168,85,247,.1)">';sec.items.forEach(function(x){h+='<div class="irow"><div style="flex:1;font-size:14px">'+x.n+'</div><input type="text" inputmode="numeric" value="'+gMF(sec.k,x.id,x.v)+'" placeholder="'+fmt(x.v)+'" onchange="sMF(\''+sec.k+'\',\''+x.id+'\',this.value.replace(/,/g,\'\'))" style="width:120px;text-align:right"></div>';});h+='</div>';}h+='</div>';});
+  h+='<div class="sg sg4"><div class="sb"><div class="l">생활예산</div><div class="v" style="color:#d8b4fe;font-size:14px">'+fmt(Math.round(bg/10000))+'만</div></div><div class="sb"><div class="l">기준일예산</div><div class="v" style="color:#d8b4fe;font-size:14px">'+fmt(dB(p))+'</div></div><div class="sb"><div class="l">총지출</div><div class="v" style="color:#f472b6;font-size:14px">'+fmt(Math.round(sp/10000))+'만</div></div><div class="sb" style="border-color:'+(sv2>=0?'rgba(52,211,153,.2)':'rgba(244,114,182,.2)')+'"><div class="l">'+(sv2>=0?'잔여':'초과')+'</div><div class="v" style="color:'+(sv2>=0?'#34d399':'#f472b6')+';font-size:14px">'+fmt(Math.abs(Math.round(sv2/10000)))+'만</div></div></div>';
+  var cats=pCats(p),ca=[];for(var c in cats)ca.push({n:c,a:cats[c]});ca.sort(function(a,b){return b.a-a.a});
+  if(ca.length>0){h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:10px">📊 카테고리</div>';ca.forEach(function(c){var pct=bg>0?Math.round(c.a/bg*100):0;var cc=CC[c.n]||'#a78bbc';h+='<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>'+(CE[c.n]||'📌')+' '+c.n+'</span><span style="font-family:monospace;font-weight:600">'+fmt(c.a)+' ('+pct+'%)</span></div><div style="height:5px;background:rgba(40,30,58,.8);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+Math.min(100,pct*2)+'%;background:'+cc+';border-radius:3px"></div></div></div>';});h+='</div>';}
+  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:10px">📅 일별 기록 '+bd+'/'+td+'일</div>';
+  var any=false;for(var di=0;di<td;di++){var dd=gDy(p,di),ds=dd.items.reduce(function(s,x){return s+x.amount},0);if(ds===0&&!dd.bt)continue;any=true;var ddt=pDate(p,di),dv=dR(p,di)-ds;
+    h+='<div class="row" onclick="S.di='+di+';S.scr=\'daily\';R()" style="cursor:pointer"><div style="width:50px;font-size:12px;font-weight:600">'+dShort(ddt.m,ddt.d)+'</div><div style="flex:1;font-size:13px">'+fmt(ds)+' <span style="color:'+(dv>=0?'#34d399':'#f472b6')+';font-size:11px">('+(dv>=0?'-'+fmt(dv):'+'+fmt(Math.abs(dv)))+')</span></div>'+(dd.rw>0?'<span style="font-size:12px;color:#fbbf24;font-weight:600">+'+fmt(dd.rw)+'</span>':'')+(dd.bt?'<span class="badge" style="background:rgba(52,211,153,.1);color:#34d399;font-size:10px">✓</span>':'')+'</div>';}
+  if(!any)h+='<div style="text-align:center;padding:16px;color:#555a6e;font-size:13px">기록 없음</div>';h+='</div>';
+  if(!o.mb&&bd>=10)h+='<button class="bm2" onclick="doMB()">👑 '+pLbl(p)+' 보스전!</button>';
+  else if(o.mb)h+='<div class="cd2" style="text-align:center"><div style="color:#34d399;font-weight:700">👑 보스전 완료!</div>'+(o.mr>0?'<div style="color:#fbbf24;margin-top:4px">+'+fmt(o.mr)+'원</div>':'')+'</div>';
+  else h+='<div class="cd2" style="text-align:center;color:#555a6e;font-size:13px">보스전: 10일+ 기록 필요 ('+bd+'일)</div>';
+  return h;}
+function rInfo(){
+  var db=dB(S.per);
+  var h='<div class="title"><h1>👑 서율이네</h1><div class="sub">안내 · 동기화</div></div>';
+  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">📅 급여 주기</div><div style="font-size:13px;color:#c4b5d0;line-height:2"><div>급여일: 매월 <span style="color:#fbbf24;font-weight:700">'+PD+'일</span></div><div>한 주기: '+PD+'일 ~ 다음달 '+(PD-1)+'일</div><div>일예산 = (수입-고정지출-저축) ÷ 주기일수</div><div style="color:#f472b6;font-weight:700">초과 → 남은 예산÷남은 일수로 자동 감소</div><div style="color:#34d399;font-weight:700">절약 → 다음날 예산 증가</div></div></div>';
+  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">💰 보상</div><div style="font-size:13px;color:#c4b5d0;line-height:2"><div>🌟 무지출 → 예산의 8%</div><div>💖 50%+ 절약 → 절약액의 10%</div><div>✨ 30%+ → 7% · ⭐ 10%+ → 5%</div><div>❌ 초과 → 보상 없음 + 내일 예산↓</div><div>👑 월간 보스전 25일+ → 보상 1.5배</div></div></div>';
+  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">🔄 가족 동기화 (GitHub)</div>'
+    +'<div style="font-size:13px;color:#c4b5d0;margin-bottom:12px">두 폰에서 같은 데이터를 공유합니다</div>'
+    +'<div id="gh_status" style="margin-bottom:10px"></div>'
+    +'<div style="margin-bottom:10px">'
+    +'<div style="font-size:12px;color:#a78bbc;margin-bottom:4px">GitHub 설정 (최초 1회)</div>'
+    +'<input type="text" id="gh_user" placeholder="GitHub 아이디" value="'+(GH.user||'')+'" style="margin-bottom:6px;font-size:14px">'
+    +'<input type="text" id="gh_repo" placeholder="저장소 이름 (예: budget)" value="'+(GH.repo||'')+'" style="margin-bottom:6px;font-size:14px">'
+    +'<input type="text" id="gh_token" placeholder="Personal Access Token" value="'+(GH.token||'')+'" style="margin-bottom:6px;font-size:14px">'
+    +'<button onclick="saveGH()" style="width:100%;padding:10px;background:rgba(168,85,247,.15);color:#d8b4fe;border:1px solid rgba(168,85,247,.2);font-weight:700;margin-bottom:10px">설정 저장</button></div>'
+    +'<button onclick="uploadGH()" style="width:100%;padding:14px;margin-bottom:8px;background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700;font-size:15px">📤 업로드 (저장하기)</button>'
+    +'<button onclick="downloadGH()" style="width:100%;padding:14px;margin-bottom:8px;background:linear-gradient(135deg,#34d399,#2dd4bf);color:#1a1125;font-weight:700;font-size:15px">📥 다운로드 (불러오기)</button>'
+    +'<div style="font-size:11px;color:#555a6e;margin-top:6px;line-height:1.6">사용법: 지출 입력 후 업로드 → 상대방이 다운로드<br>Token 만들기: GitHub → Settings → Developer settings → Personal access tokens → Generate (repo 권한 체크)</div></div>';
+  h+='<button style="width:100%;margin-top:12px;padding:12px;background:rgba(244,114,182,.08);color:#f472b6;border:1px solid rgba(244,114,182,.12)" onclick="if(confirm(\'전체 초기화?\')){D={};sv();R();}">전체 초기화</button>';return h;}
+var GH={};
+function loadGH(){try{var s=localStorage.getItem('syul_gh');if(s)GH=JSON.parse(s);else GH={};}catch(e){GH={};}}
+function saveGH(){
+  GH.user=document.getElementById('gh_user').value.trim();
+  GH.repo=document.getElementById('gh_repo').value.trim();
+  GH.token=document.getElementById('gh_token').value.trim();
+  try{localStorage.setItem('syul_gh',JSON.stringify(GH));}catch(e){}
+  alert('GitHub 설정 저장 완료!');R();
+}
+function ghOK(){return GH.user&&GH.repo&&GH.token;}
+function ghURL(){return'https://api.github.com/repos/'+GH.user+'/'+GH.repo+'/contents/data.json';}
+function ghHead(){return{'Authorization':'token '+GH.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'};}
+
+async function uploadGH(){
+  if(!ghOK())return alert('GitHub 설정을 먼저 입력해주세요');
+  var btn=event.target;btn.textContent='업로드 중...';btn.disabled=true;
+  try{
+    var sha='';
+    try{var r=await fetch(ghURL(),{headers:ghHead()});if(r.ok){var j=await r.json();sha=j.sha;}}catch(e){}
+    var body={message:'서율이네 가계부 '+new Date().toLocaleString('ko-KR'),content:btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2))))};
+    if(sha)body.sha=sha;
+    var r2=await fetch(ghURL(),{method:'PUT',headers:ghHead(),body:JSON.stringify(body)});
+    if(r2.ok)alert('업로드 완료! 상대방이 다운로드하면 동기화됩니다.');
+    else{var err=await r2.json();alert('업로드 실패: '+(err.message||r2.status));}
+  }catch(e){alert('업로드 오류: '+e.message);}
+  btn.textContent='📤 업로드 (저장하기)';btn.disabled=false;
+}
+
+async function downloadGH(){
+  if(!ghOK())return alert('GitHub 설정을 먼저 입력해주세요');
+  var btn=event.target;btn.textContent='다운로드 중...';btn.disabled=true;
+  try{
+    var r=await fetch(ghURL(),{headers:ghHead()});
+    if(!r.ok){alert('다운로드 실패: 데이터가 없거나 설정 오류');btn.textContent='📥 다운로드 (불러오기)';btn.disabled=false;return;}
+    var j=await r.json();
+    var raw=decodeURIComponent(escape(atob(j.content.replace(/\n/g,''))));
+    var parsed=JSON.parse(raw);
+    if(!confirm('서버 데이터로 덮어씌울까요?')){btn.textContent='📥 다운로드 (불러오기)';btn.disabled=false;return;}
+    D=parsed;sv();alert('다운로드 완료!');R();
+  }catch(e){alert('다운로드 오류: '+e.message);}
+  btn.textContent='📥 다운로드 (불러오기)';btn.disabled=false;
+}
+loadGH();
+function R(){
+  var c='';if(S.scr==='battle')c=rBattle();else if(S.scr==='month')c=rMonth();else if(S.scr==='info')c=rInfo();else c=rDaily();
+  var tp=todayP();
+  c+='<div class="nb"><button class="'+(S.scr==='daily'?'on':'')+'" onclick="S.scr=\'daily\';R()">⚔️ 오늘</button><button class="'+(S.scr==='month'?'on':'')+'" onclick="S.scr=\'month\';R()">📊 월간</button><button onclick="S.per='+tp.p+';S.di='+tp.i+';S.scr=\'daily\';R()" style="background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700;font-size:12px">TODAY</button><button class="'+(S.scr==='info'?'on':'')+'" onclick="S.scr=\'info\';R()">💡</button></div>';
+  document.getElementById('app').innerHTML=c;
+  var n=document.getElementById('i_nm');if(n){document.getElementById('i_am').onkeydown=function(e){if(e.key==='Enter')addI();};n.onkeydown=function(e){if(e.key==='Enter')document.getElementById('i_am').focus();};}
+}
+load();R();
+</script>
+</body>
+</html>
