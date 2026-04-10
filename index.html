@@ -90,6 +90,9 @@ function sv(){try{localStorage.setItem(SK,JSON.stringify(D));}catch(e){}}
 function pI(p){var o=gP(p),t=0;DI.forEach(function(x){t+=Number(o.inc[x.id]||x.v)||0;});return t;}
 function pF(p){var o=gP(p),t=0;DF.forEach(function(x){t+=Number(o.fix[x.id]||x.v)||0;});return t;}
 function pS(p){var o=gP(p),t=0;DS.forEach(function(x){t+=Number(o.sav[x.id]||x.v)||0;});return t;}
+function pSAct(p){var o=gP(p),t=0;if(!o.sd)o.sd={};DS.forEach(function(x){if(o.sd[x.id]!==false)t+=Number(o.sav[x.id]||x.v)||0;});return t;}
+function togSD(p,id){var o=gP(p);if(!o.sd)o.sd={};o.sd[id]=o.sd[id]===false?true:false;sv();R();}
+function isSD(p,id){var o=gP(p);return!o.sd||o.sd[id]!==false;}
 function pB(p){return Math.max(0,pI(p)-pF(p)-pS(p));}
 function dB(p){return Math.round(pB(p)/pLen(p));}
 function dSp(p,i){return gDy(p,i).items.reduce(function(s,x){return s+x.amount},0);}
@@ -163,10 +166,19 @@ function rMonth(){
   h+='<div class="mn"><button onclick="S.per=(S.per-1+12)%12;R()"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M10 3L5 8L10 13" stroke="#a78bbc" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button><div style="text-align:center"><div style="font-size:20px;font-weight:800">'+pLbl(p)+(o.mb?' <span class="badge" style="background:rgba(52,211,153,.1);color:#34d399">CLEAR</span>':'')+'</div><div style="font-size:11px;color:#555a6e">'+pRng(p)+'</div></div><button onclick="S.per=(S.per+1)%12;R()"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M6 3L11 8L6 13" stroke="#a78bbc" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button></div>';
   h+='<div class="cd cd-glow" style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:11px;color:#a78bbc">💰 누적 보상금</div><div style="font-size:22px;font-weight:800;color:#fbbf24">'+fmt(bank)+'<span style="font-size:13px">원</span></div></div><button onclick="clm()" '+(bank>0?'':'disabled')+' style="padding:10px 18px;font-weight:700;border-radius:99px;'+(bank>0?'background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#1a1125':'')+'">수령하기</button></div>';
   h+='<div class="cd" style="display:flex;align-items:center;justify-content:space-between"><div style="flex:1"><div style="font-size:14px;font-weight:700">📅 이달 월급일</div><div style="font-size:11px;color:#a78bbc">주말/공휴일이면 변경</div></div><input type="text" inputmode="numeric" value="'+getPD(p)+'" onchange="var v=parseInt(this.value);if(v>=1&&v<=28){setPD('+p+',v);}else{alert(\'1~28 사이\');}" style="width:60px;text-align:center;font-size:18px;font-weight:700"><span style="font-size:14px;color:#a78bbc;margin-left:6px">일</span></div>';
-  [{k:'inc',i:'💵',l:'수입',t:pI(p),items:DI,c:'#d8b4fe'},{k:'fix',i:'⚡',l:'고정 지출',t:pF(p),items:DF,c:'#f472b6'},{k:'sav',i:'💎',l:'저축/투자',t:pS(p),items:DS,c:'#34d399'}].forEach(function(sec){
+  [{k:'inc',i:'💵',l:'수입',t:pI(p),items:DI,c:'#d8b4fe'},{k:'fix',i:'⚡',l:'고정 지출',t:pF(p),items:DF,c:'#f472b6'},{k:'sav',i:'💎',l:'저축/투자 (실행: '+fmt(pSAct(p))+')',t:pS(p),items:DS,c:'#34d399'}].forEach(function(sec){
     var isO=S.oc===sec.k;
     h+='<div class="cd" style="padding:0;overflow:hidden"><div onclick="S.oc=S.oc===\''+sec.k+'\'?null:\''+sec.k+'\';R()" style="padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:10px"><div style="font-size:18px">'+sec.i+'</div><div style="flex:1"><div style="font-size:14px;font-weight:700">'+sec.l+'</div><div style="font-size:12px;color:'+sec.c+'">'+fmt(sec.t)+'원</div></div><svg width="14" height="14" viewBox="0 0 16 16" style="transform:rotate('+(isO?180:0)+'deg);transition:.2s"><path d="M4 6L8 10L12 6" stroke="#a78bbc" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>';
-    if(isO){h+='<div style="padding:0 16px 14px;border-top:1px solid rgba(168,85,247,.1)">';sec.items.forEach(function(x){h+='<div class="irow"><div style="flex:1;font-size:14px">'+x.n+'</div><input type="text" inputmode="numeric" value="'+gMF(sec.k,x.id,x.v)+'" placeholder="'+fmt(x.v)+'" onchange="sMF(\''+sec.k+'\',\''+x.id+'\',this.value.replace(/,/g,\'\'))" style="width:120px;text-align:right"></div>';});h+='</div>';}h+='</div>';});
+    if(isO){h+='<div style="padding:0 16px 14px;border-top:1px solid rgba(168,85,247,.1)">';
+      if(sec.k==='sav'){
+        sec.items.forEach(function(x){
+          var done=isSD(p,x.id);
+          h+='<div class="irow"><div onclick="togSD('+p+',\''+x.id+'\')" style="width:28px;height:28px;border-radius:8px;border:2px solid '+(done?'#34d399':'#555a6e')+';background:'+(done?'rgba(52,211,153,.15)':'transparent')+';display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">'+(done?'<svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.5L5.5 10.5L11.5 4" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>':'')+'</div><div style="flex:1;font-size:14px;'+(done?'':'color:#555a6e;text-decoration:line-through')+'">'+x.n+'</div><input type="text" inputmode="numeric" value="'+gMF(sec.k,x.id,x.v)+'" placeholder="'+fmt(x.v)+'" onchange="sMF(\''+sec.k+'\',\''+x.id+'\',this.value.replace(/,/g,\'\'))" style="width:110px;text-align:right;'+(done?'':'opacity:.4')+'"></div>';
+        });
+      }else{
+        sec.items.forEach(function(x){h+='<div class="irow"><div style="flex:1;font-size:14px">'+x.n+'</div><input type="text" inputmode="numeric" value="'+gMF(sec.k,x.id,x.v)+'" placeholder="'+fmt(x.v)+'" onchange="sMF(\''+sec.k+'\',\''+x.id+'\',this.value.replace(/,/g,\'\'))" style="width:120px;text-align:right"></div>';});
+      }
+      h+='</div>';}h+='</div>';});
   h+='<div class="sg sg4"><div class="sb"><div class="l">생활예산</div><div class="v" style="color:#d8b4fe;font-size:14px">'+fmt(Math.round(bg/10000))+'만</div></div><div class="sb"><div class="l">기준일예산</div><div class="v" style="color:#d8b4fe;font-size:14px">'+fmt(dB(p))+'</div></div><div class="sb"><div class="l">총지출</div><div class="v" style="color:#f472b6;font-size:14px">'+fmt(Math.round(sp/10000))+'만</div></div><div class="sb" style="border-color:'+(sv2>=0?'rgba(52,211,153,.2)':'rgba(244,114,182,.2)')+'"><div class="l">'+(sv2>=0?'잔여':'초과')+'</div><div class="v" style="color:'+(sv2>=0?'#34d399':'#f472b6')+';font-size:14px">'+fmt(Math.abs(Math.round(sv2/10000)))+'만</div></div></div>';
   var cats=pCats(p),ca=[];for(var c in cats)ca.push({n:c,a:cats[c]});ca.sort(function(a,b){return b.a-a.a});
   if(ca.length>0){h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:10px">📊 카테고리</div>';ca.forEach(function(c){var pct=bg>0?Math.round(c.a/bg*100):0;var cc=CC[c.n]||'#a78bbc';h+='<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>'+(CE[c.n]||'📌')+' '+c.n+'</span><span style="font-family:monospace;font-weight:600">'+fmt(c.a)+' ('+pct+'%)</span></div><div style="height:5px;background:rgba(40,30,58,.8);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+Math.min(100,pct*2)+'%;background:'+cc+';border-radius:3px"></div></div></div>';});h+='</div>';}
@@ -262,19 +274,19 @@ function totalSaved(){
 
 function assetData(){
   var set=getSet(),ef=getEF();
-  var startDate=set.start?new Date(set.start):null;
+  var sm=-1,sd=0;
+  if(set.start){var parts=set.start.split('-');sm=parseInt(parts[1])-1;sd=parseInt(parts[2]);}
   var saved=0,months=[];
   var allP=Object.keys(D).filter(function(k){return k.charAt(0)!=='_'}).sort(function(a,b){return Number(a)-Number(b)});
   var cumul=0;
   allP.forEach(function(k){
     var p=Number(k),o=D[k];if(!o)return;
-    if(startDate){
-      var yr=startDate.getFullYear();
-      if(p<startDate.getMonth())yr++;
-      var pStart=new Date(yr,p,getPD(p));
-      if(pStart<startDate)return;
+    if(sm>=0){
+      if(p<sm)return;
+      if(p===sm&&getPD(p)<sd)return;
     }
-    var savAmt=pS(p);
+    var savAmt=pSAct(p);
+    if(savAmt===0)return;
     cumul+=savAmt;
     months.push({p:p,label:MN[p],sav:savAmt,cumul:cumul});
     saved+=savAmt;
@@ -294,7 +306,7 @@ function rAsset(){
   h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:10px">⚙️ 자산 설정</div>'
     +'<div class="irow"><div style="flex:1;font-size:14px">시작일</div><input type="text" value="'+(set.start||'')+'" placeholder="예: 2025-04-12" onchange="getSet().start=this.value;sv();R()" style="width:140px;text-align:center;font-size:14px"></div>'
     +'<div class="irow"><div style="flex:1;font-size:14px">목표 자산</div><input type="text" inputmode="numeric" value="'+(set.target||'')+'" placeholder="100000000" onchange="getSet().target=Number(this.value.replace(/[^0-9]/g,String()));sv();R()" style="width:140px;text-align:right;font-size:14px"></div>';
-  if(set.start){var sd=new Date(set.start),now=new Date(),diff=Math.floor((now-sd)/(1000*60*60*24));h+='<div style="font-size:12px;color:#a78bbc;margin-top:6px;text-align:center">가계부 시작 <span style="color:#fbbf24;font-weight:700">'+diff+'일째</span></div>';}
+  if(set.start){var sp=set.start.split('-');var sd2=new Date(parseInt(sp[0]),parseInt(sp[1])-1,parseInt(sp[2]));var now=new Date();now.setHours(0,0,0,0);var diff=Math.floor((now-sd2)/(1000*60*60*24));h+='<div style="font-size:12px;color:#a78bbc;margin-top:6px;text-align:center">가계부 시작 <span style="color:#fbbf24;font-weight:700">'+diff+'일째</span></div>';}
   h+='</div>';
 
   // Summary cards
