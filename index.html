@@ -49,18 +49,23 @@ input::placeholder{color:rgba(168,130,200,.35)}
 <body>
 <div id="stars"></div>
 <div class="app" id="app"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 (function(){for(var i=0;i<40;i++){var s=document.createElement('div');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=Math.random()*5+'s';s.style.animationDuration=(2+Math.random()*4)+'s';document.getElementById('stars').appendChild(s);}})();
 var SK='syul4',D={},S={scr:'daily',per:0,di:0,oc:null,bat:null};
-var PD=12,DIM=[31,28,31,30,31,30,31,31,30,31,30,31],MN=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+var DIM=[31,28,31,30,31,30,31,31,30,31,30,31],MN=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 var fmt=function(n){return Math.round(n).toLocaleString('ko-KR')};
-function pLen(p){return(DIM[p]-PD+1)+(PD-1);}
-function pDate(p,i){var d1=DIM[p]-PD+1;if(i<d1)return{m:p,d:PD+i};return{m:(p+1)%12,d:i-d1+1};}
+var DEF_PD=12;
+function getPD(p){var o=D[p];return(o&&o.pd)?o.pd:DEF_PD;}
+function getNextPD(p){return getPD((p+1)%12);}
+function pLen(p){return(DIM[p]-getPD(p)+1)+(getNextPD(p)-1);}
+function pDate(p,i){var d1=DIM[p]-getPD(p)+1;if(i<d1)return{m:p,d:getPD(p)+i};return{m:(p+1)%12,d:i-d1+1};}
 function pLbl(p){return MN[p]+' 급여';}
-function pRng(p){return MN[p]+' '+PD+'일~'+MN[(p+1)%12]+' '+(PD-1)+'일';}
-function d2p(m,d){if(d>=PD)return{p:m,i:d-PD};var pm=(m-1+12)%12;return{p:pm,i:(DIM[pm]-PD+1)+(d-1)};}
+function pRng(p){return MN[p]+' '+getPD(p)+'일~'+MN[(p+1)%12]+' '+(getNextPD(p)-1)+'일';}
+function d2p(m,d){var pd=getPD(m);if(d>=pd)return{p:m,i:d-pd};var pm=(m-1+12)%12;return{p:pm,i:(DIM[pm]-getPD(pm)+1)+(d-1)};}
 function todayP(){var n=new Date();return d2p(n.getMonth(),n.getDate());}
 function dFull(m,d){return MN[m]+' '+d+'일';}
+function setPD(p,v){gP(p).pd=v;sv();R();}
 function dShort(m,d){return(m+1)+'/'+d;}
 (function(){var t=todayP();S.per=t.p;S.di=t.i;})();
 var DI=[{id:'sal_m',n:'마스터 월급',v:3300000},{id:'sal_j',n:'지은 월급',v:1600000},{id:'bonus',n:'상여금',v:1000000},{id:'gov',n:'부모급여',v:500000},{id:'child',n:'아동수당',v:100000}];
@@ -157,6 +162,7 @@ function rMonth(){
   var h='<div class="title"><h1>👑 서율이네</h1><div class="sub">'+pLbl(p)+' 관리</div></div>';
   h+='<div class="mn"><button onclick="S.per=(S.per-1+12)%12;R()"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M10 3L5 8L10 13" stroke="#a78bbc" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button><div style="text-align:center"><div style="font-size:20px;font-weight:800">'+pLbl(p)+(o.mb?' <span class="badge" style="background:rgba(52,211,153,.1);color:#34d399">CLEAR</span>':'')+'</div><div style="font-size:11px;color:#555a6e">'+pRng(p)+'</div></div><button onclick="S.per=(S.per+1)%12;R()"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M6 3L11 8L6 13" stroke="#a78bbc" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button></div>';
   h+='<div class="cd cd-glow" style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:11px;color:#a78bbc">💰 누적 보상금</div><div style="font-size:22px;font-weight:800;color:#fbbf24">'+fmt(bank)+'<span style="font-size:13px">원</span></div></div><button onclick="clm()" '+(bank>0?'':'disabled')+' style="padding:10px 18px;font-weight:700;border-radius:99px;'+(bank>0?'background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#1a1125':'')+'">수령하기</button></div>';
+  h+='<div class="cd" style="display:flex;align-items:center;justify-content:space-between"><div style="flex:1"><div style="font-size:14px;font-weight:700">📅 이달 월급일</div><div style="font-size:11px;color:#a78bbc">주말/공휴일이면 변경</div></div><input type="text" inputmode="numeric" value="'+getPD(p)+'" onchange="var v=parseInt(this.value);if(v>=1&&v<=28){setPD('+p+',v);}else{alert(\'1~28 사이\');}" style="width:60px;text-align:center;font-size:18px;font-weight:700"><span style="font-size:14px;color:#a78bbc;margin-left:6px">일</span></div>';
   [{k:'inc',i:'💵',l:'수입',t:pI(p),items:DI,c:'#d8b4fe'},{k:'fix',i:'⚡',l:'고정 지출',t:pF(p),items:DF,c:'#f472b6'},{k:'sav',i:'💎',l:'저축/투자',t:pS(p),items:DS,c:'#34d399'}].forEach(function(sec){
     var isO=S.oc===sec.k;
     h+='<div class="cd" style="padding:0;overflow:hidden"><div onclick="S.oc=S.oc===\''+sec.k+'\'?null:\''+sec.k+'\';R()" style="padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:10px"><div style="font-size:18px">'+sec.i+'</div><div style="flex:1"><div style="font-size:14px;font-weight:700">'+sec.l+'</div><div style="font-size:12px;color:'+sec.c+'">'+fmt(sec.t)+'원</div></div><svg width="14" height="14" viewBox="0 0 16 16" style="transform:rotate('+(isO?180:0)+'deg);transition:.2s"><path d="M4 6L8 10L12 6" stroke="#a78bbc" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>';
@@ -175,7 +181,7 @@ function rMonth(){
 function rInfo(){
   var db=dB(S.per);
   var h='<div class="title"><h1>👑 서율이네</h1><div class="sub">안내 · 동기화</div></div>';
-  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">📅 급여 주기</div><div style="font-size:13px;color:#c4b5d0;line-height:2"><div>급여일: 매월 <span style="color:#fbbf24;font-weight:700">'+PD+'일</span></div><div>한 주기: '+PD+'일 ~ 다음달 '+(PD-1)+'일</div><div>일예산 = (수입-고정지출-저축) ÷ 주기일수</div><div style="color:#f472b6;font-weight:700">초과 → 남은 예산÷남은 일수로 자동 감소</div><div style="color:#34d399;font-weight:700">절약 → 다음날 예산 증가</div></div></div>';
+  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">📅 급여 주기</div><div style="font-size:13px;color:#c4b5d0;line-height:2"><div>급여일: 기본 <span style="color:#fbbf24;font-weight:700">12일</span> (월간 탭에서 변경)</div><div>주말·공휴일이면 해당 달만 바꾸세요</div><div>일예산 = (수입-고정지출-저축) ÷ 주기일수</div><div style="color:#f472b6;font-weight:700">초과 → 남은 예산÷남은 일수로 자동 감소</div><div style="color:#34d399;font-weight:700">절약 → 다음날 예산 증가</div></div></div>';
   h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">💰 보상</div><div style="font-size:13px;color:#c4b5d0;line-height:2"><div>🌟 무지출 → 예산의 8%</div><div>💖 50%+ 절약 → 절약액의 10%</div><div>✨ 30%+ → 7% · ⭐ 10%+ → 5%</div><div>❌ 초과 → 보상 없음 + 내일 예산↓</div><div>👑 월간 보스전 25일+ → 보상 1.5배</div></div></div>';
   h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">🔄 가족 동기화</div>'
     +'<div style="font-size:13px;color:#c4b5d0;margin-bottom:12px">두 폰에서 같은 데이터를 공유합니다</div>';
@@ -238,12 +244,155 @@ async function downloadGH(){
   }catch(e){alert('오류: '+e.message);}
 }
 loadGH();
+
+// === Settings & Asset ===
+function getSet(){if(!D._set)D._set={start:'',target:100000000};return D._set;}
+function getEF(){if(!D._ef)D._ef={bal:0,log:[]};return D._ef;}
+function addEFIn(amt,note){var ef=getEF();ef.bal+=amt;ef.log.push({type:'in',amt:amt,note:note,date:new Date().toLocaleDateString('ko-KR')});sv();R();}
+function addEFOut(amt,note){var ef=getEF();if(amt>ef.bal){alert('잔액 부족');return;}ef.bal-=amt;ef.log.push({type:'out',amt:amt,note:note,date:new Date().toLocaleDateString('ko-KR')});sv();R();}
+function rmEFLog(i){var ef=getEF();var l=ef.log[i];if(!l)return;if(l.type==='in')ef.bal-=l.amt;else ef.bal+=l.amt;ef.log.splice(i,1);sv();R();}
+
+function totalSaved(){
+  var t=0;
+  for(var p in D){if(p.charAt(0)==='_')continue;var o=D[p];if(!o)continue;t+=pS(Number(p));}
+  var months=Object.keys(D).filter(function(k){return k.charAt(0)!=='_'&&D[k]&&D[k].mb}).length;
+  if(months===0){var ps=Object.keys(D).filter(function(k){return k.charAt(0)!=='_'});months=ps.length>0?ps.length:0;}
+  return{monthly:t,months:months,total:t*Math.max(1,months)};
+}
+
+function assetData(){
+  var set=getSet(),ef=getEF();
+  var startDate=set.start?new Date(set.start):null;
+  var saved=0,months=[];
+  var allP=Object.keys(D).filter(function(k){return k.charAt(0)!=='_'}).sort(function(a,b){return Number(a)-Number(b)});
+  var cumul=0;
+  allP.forEach(function(k){
+    var p=Number(k),o=D[k];if(!o)return;
+    if(startDate){
+      var yr=startDate.getFullYear();
+      if(p<startDate.getMonth())yr++;
+      var pStart=new Date(yr,p,getPD(p));
+      if(pStart<startDate)return;
+    }
+    var savAmt=pS(p);
+    cumul+=savAmt;
+    months.push({p:p,label:MN[p],sav:savAmt,cumul:cumul});
+    saved+=savAmt;
+  });
+  var netAsset=cumul-ef.bal;
+  return{saved:saved,months:months,cumul:cumul,efBal:ef.bal,netAsset:netAsset};
+}
+
+function rAsset(){
+  var set=getSet(),ef=getEF(),ad=assetData();
+  var target=set.target||100000000;
+  var achieve=target>0?Math.min(100,Math.round(ad.netAsset/target*100)):0;
+
+  var h='<div class="title"><h1>👑 서율이네</h1><div class="sub">자산 현황</div></div>';
+
+  // Settings
+  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:10px">⚙️ 자산 설정</div>'
+    +'<div class="irow"><div style="flex:1;font-size:14px">시작일</div><input type="text" value="'+(set.start||'')+'" placeholder="예: 2025-04-12" onchange="getSet().start=this.value;sv();R()" style="width:140px;text-align:center;font-size:14px"></div>'
+    +'<div class="irow"><div style="flex:1;font-size:14px">목표 자산</div><input type="text" inputmode="numeric" value="'+(set.target||'')+'" placeholder="100000000" onchange="getSet().target=Number(this.value.replace(/[^0-9]/g,String()));sv();R()" style="width:140px;text-align:right;font-size:14px"></div>';
+  if(set.start){var sd=new Date(set.start),now=new Date(),diff=Math.floor((now-sd)/(1000*60*60*24));h+='<div style="font-size:12px;color:#a78bbc;margin-top:6px;text-align:center">가계부 시작 <span style="color:#fbbf24;font-weight:700">'+diff+'일째</span></div>';}
+  h+='</div>';
+
+  // Summary cards
+  h+='<div class="sg sg2">'
+    +'<div class="sb"><div class="l">월 저축 목표</div><div class="v" style="color:#34d399;font-size:15px">'+fmt(Math.round(pS(S.per)/10000))+'만</div></div>'
+    +'<div class="sb"><div class="l">누적 저축</div><div class="v" style="color:#d8b4fe;font-size:15px">'+fmt(Math.round(ad.cumul/10000))+'만</div></div></div>';
+
+  h+='<div class="sg sg2">'
+    +'<div class="sb"><div class="l">비상금 (별도)</div><div class="v" style="color:#fbbf24;font-size:15px">'+fmt(Math.round(ef.bal/10000))+'만</div></div>'
+    +'<div class="sb"><div class="l">순 자산</div><div class="v" style="color:#34d399;font-size:15px">'+fmt(Math.round(ad.netAsset/10000))+'만</div></div></div>';
+
+  // Achievement
+  h+='<div class="cd"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div style="font-size:14px;font-weight:700">🎯 목표 달성률</div><div style="font-size:18px;font-weight:800;color:'+(achieve>=100?'#34d399':achieve>=50?'#fbbf24':'#f472b6')+'">'+achieve+'%</div></div>'
+    +'<div style="height:12px;background:rgba(40,30,58,.8);border-radius:6px;overflow:hidden;border:1px solid rgba(168,85,247,.15)"><div style="height:100%;width:'+achieve+'%;background:linear-gradient(90deg,#a855f7,#ec4899);border-radius:6px;transition:width .5s"></div></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:11px;color:#a78bbc;margin-top:4px"><span>'+fmt(ad.netAsset)+'원</span><span>목표 '+fmt(target)+'원</span></div></div>';
+
+  // Chart
+  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:10px">📈 자산 성장 그래프</div>'
+    +'<div style="position:relative;height:220px"><canvas id="assetChart"></canvas></div></div>';
+
+  // Monthly breakdown
+  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:10px">📊 월별 저축 내역</div>';
+  if(ad.months.length===0)h+='<div style="text-align:center;padding:16px;color:#555a6e;font-size:13px">아직 데이터가 없습니다</div>';
+  else ad.months.forEach(function(m){
+    h+='<div class="row"><div style="width:40px;font-size:13px;font-weight:600">'+m.label+'</div>'
+      +'<div style="flex:1"><div style="height:5px;background:rgba(40,30,58,.8);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+Math.min(100,Math.round(m.sav/2000000*100))+'%;background:linear-gradient(90deg,#a855f7,#34d399);border-radius:3px"></div></div></div>'
+      +'<div style="font-size:13px;font-weight:600;min-width:70px;text-align:right">'+fmt(Math.round(m.sav/10000))+'만</div></div>';
+  });
+  h+='</div>';
+  return h;
+}
+
+function rEmerg(){
+  var ef=getEF();
+  var h='<div class="title"><h1>👑 서율이네</h1><div class="sub">비상금 관리</div></div>';
+
+  h+='<div class="cd cd-glow" style="text-align:center"><div style="font-size:12px;color:#a78bbc">비상금 잔액</div>'
+    +'<div style="font-size:32px;font-weight:800;color:#fbbf24;margin:6px 0">'+fmt(ef.bal)+'<span style="font-size:16px">원</span></div>'
+    +'<div style="font-size:11px;color:#555a6e">자산 증식 계산에서 별도 관리</div></div>';
+
+  // Add income
+  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:10px">➕ 비상금 입금</div>'
+    +'<div style="display:flex;gap:8px"><input type="text" id="ef_in_note" placeholder="사유 (월저축, 보너스 등)" style="flex:1.3">'
+    +'<input type="text" id="ef_in_amt" inputmode="numeric" placeholder="금액" style="flex:.7;text-align:right">'
+    +'<button onclick="var a=Number(document.getElementById(\'ef_in_amt\').value.replace(/,/g,\'\'));var n=document.getElementById(\'ef_in_note\').value.trim()||\'입금\';if(a>0){addEFIn(a,n);}" style="padding:10px 16px;background:linear-gradient(135deg,#34d399,#2dd4bf);color:#1a1125;font-weight:700;flex-shrink:0;border-radius:12px">+</button></div></div>';
+
+  // Withdraw
+  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:10px">➖ 비상금 출금</div>'
+    +'<div style="display:flex;gap:8px"><input type="text" id="ef_out_note" placeholder="사유 (조의금, 축의금 등)" style="flex:1.3">'
+    +'<input type="text" id="ef_out_amt" inputmode="numeric" placeholder="금액" style="flex:.7;text-align:right">'
+    +'<button onclick="var a=Number(document.getElementById(\'ef_out_amt\').value.replace(/,/g,\'\'));var n=document.getElementById(\'ef_out_note\').value.trim()||\'출금\';if(a>0){addEFOut(a,n);}" style="padding:10px 16px;background:linear-gradient(135deg,#ec4899,#f43f5e);color:#fff;font-weight:700;flex-shrink:0;border-radius:12px">-</button></div></div>';
+
+  // History
+  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:10px">📋 비상금 내역</div>';
+  if(ef.log.length===0)h+='<div style="text-align:center;padding:16px;color:#555a6e;font-size:13px">아직 내역이 없습니다</div>';
+  else{
+    var bal2=0;
+    ef.log.slice().reverse().forEach(function(l,ri){
+      var idx=ef.log.length-1-ri;
+      var isIn=l.type==='in';
+      h+='<div class="row pop"><div style="flex:1"><div style="font-size:14px">'+l.note+'</div><div style="font-size:11px;color:#555a6e">'+l.date+'</div></div>'
+        +'<div style="font-size:15px;font-weight:700;font-family:monospace;color:'+(isIn?'#34d399':'#f472b6')+'">'+(isIn?'+':'-')+fmt(l.amt)+'</div>'
+        +'<button onclick="if(confirm(\'삭제할까요?\')){rmEFLog('+idx+');}" style="padding:4px 8px;font-size:11px;color:#f472b6;background:rgba(244,114,182,.1);border-radius:8px">✕</button></div>';
+    });
+  }
+  h+='</div>';
+  return h;
+}
+
 function R(){
-  var c='';if(S.scr==='battle')c=rBattle();else if(S.scr==='month')c=rMonth();else if(S.scr==='info')c=rInfo();else c=rDaily();
+  var c='';
+  if(S.scr==='battle')c=rBattle();
+  else if(S.scr==='month')c=rMonth();
+  else if(S.scr==='asset')c=rAsset();
+  else if(S.scr==='emerg')c=rEmerg();
+  else if(S.scr==='info')c=rInfo();
+  else c=rDaily();
   var tp=todayP();
-  c+='<div class="nb"><button class="'+(S.scr==='daily'?'on':'')+'" onclick="S.scr=\'daily\';R()">⚔️ 오늘</button><button class="'+(S.scr==='month'?'on':'')+'" onclick="S.scr=\'month\';R()">📊 월간</button><button onclick="S.per='+tp.p+';S.di='+tp.i+';S.scr=\'daily\';R()" style="background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700;font-size:12px">TODAY</button><button class="'+(S.scr==='info'?'on':'')+'" onclick="S.scr=\'info\';R()">💡</button></div>';
+  c+='<div class="nb">'
+    +'<button class="'+(S.scr==='daily'?'on':'')+'" onclick="S.scr=\'daily\';R()" style="font-size:10px">⚔️오늘</button>'
+    +'<button class="'+(S.scr==='month'?'on':'')+'" onclick="S.scr=\'month\';R()" style="font-size:10px">📊월간</button>'
+    +'<button class="'+(S.scr==='asset'?'on':'')+'" onclick="S.scr=\'asset\';R()" style="font-size:10px">📈자산</button>'
+    +'<button class="'+(S.scr==='emerg'?'on':'')+'" onclick="S.scr=\'emerg\';R()" style="font-size:10px">🆘비상</button>'
+    +'<button onclick="S.per='+tp.p+';S.di='+tp.i+';S.scr=\'daily\';R()" style="background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700;font-size:10px">TODAY</button>'
+    +'<button class="'+(S.scr==='info'?'on':'')+'" onclick="S.scr=\'info\';R()" style="font-size:10px">💡</button></div>';
   document.getElementById('app').innerHTML=c;
   var n=document.getElementById('i_nm');if(n){document.getElementById('i_am').onkeydown=function(e){if(e.key==='Enter')addI();};n.onkeydown=function(e){if(e.key==='Enter')document.getElementById('i_am').focus();};}
+  // Render chart if on asset page
+  if(S.scr==='asset'){
+    var cv=document.getElementById('assetChart');
+    if(cv&&typeof Chart!=='undefined'){
+      var ad=assetData();
+      var labels=ad.months.map(function(m){return m.label});
+      var data=ad.months.map(function(m){return Math.round(m.cumul/10000)});
+      if(labels.length===0){labels=['시작'];data=[0];}
+      new Chart(cv,{type:'line',data:{labels:labels,datasets:[{label:'누적 저축(만원)',data:data,borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,.1)',fill:true,pointRadius:4,pointBackgroundColor:'#ec4899',borderWidth:2.5,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#a78bbc',font:{size:11}},grid:{display:false}},y:{ticks:{color:'#a78bbc',font:{size:11},callback:function(v){return v+'만'}},grid:{color:'rgba(168,85,247,.08)'}}}}});
+    }
+  }
 }
 load();R();
 </script>
