@@ -203,43 +203,39 @@ function rInfo(){
 var GH={};
 function loadGH(){try{var s=localStorage.getItem('syul_gh');if(s)GH=JSON.parse(s);else GH={};}catch(e){GH={};}}
 function saveToken(){
-  var t=document.getElementById('gh_token').value.trim();
+  var t=document.getElementById('gh_token').value.replace(/[^\x20-\x7E]/g,'').trim();
   if(!t){alert('토큰을 입력해주세요');return;}
   GH.token=t;
   try{localStorage.setItem('syul_gh',JSON.stringify(GH));}catch(e){}
-  alert('토큰 등록 완료! 이제 업로드/다운로드 가능합니다');R();
+  alert('토큰 등록 완료!');R();
 }
 function ghURL(){return'https://api.github.com/repos/hn98201/budget/contents/data.json';}
-function ghHead(){return{'Authorization':'token '+GH.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'};}
+function ghHead(){return{'Authorization':'token '+GH.token.replace(/[^\x20-\x7E]/g,'').trim(),'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'};}
 
 async function uploadGH(){
   if(!GH.token)return alert('토큰을 먼저 등록해주세요');
-  var btn=event.target;btn.textContent='업로드 중...';btn.disabled=true;
   try{
     var sha='';
     try{var r=await fetch(ghURL(),{headers:ghHead()});if(r.ok){var j=await r.json();sha=j.sha;}}catch(e){}
-    var body={message:'서율이네 '+new Date().toLocaleString('ko-KR'),content:btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2))))};
+    var body={message:'update '+new Date().getTime(),content:btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2))))};
     if(sha)body.sha=sha;
     var r2=await fetch(ghURL(),{method:'PUT',headers:ghHead(),body:JSON.stringify(body)});
     if(r2.ok)alert('업로드 완료!');
     else{var err=await r2.json();alert('실패: '+(err.message||r2.status));}
   }catch(e){alert('오류: '+e.message);}
-  btn.textContent='📤 업로드 (저장하기)';btn.disabled=false;
 }
 
 async function downloadGH(){
   if(!GH.token)return alert('토큰을 먼저 등록해주세요');
-  var btn=event.target;btn.textContent='다운로드 중...';btn.disabled=true;
   try{
     var r=await fetch(ghURL(),{headers:ghHead()});
-    if(!r.ok){alert('데이터가 없습니다. 먼저 업로드해주세요');btn.textContent='📥 다운로드 (불러오기)';btn.disabled=false;return;}
+    if(!r.ok){alert('데이터가 없습니다. 먼저 업로드해주세요');return;}
     var j=await r.json();
     var raw=decodeURIComponent(escape(atob(j.content.replace(/\n/g,''))));
     var parsed=JSON.parse(raw);
-    if(!confirm('서버 데이터로 덮어씌울까요?')){btn.textContent='📥 다운로드 (불러오기)';btn.disabled=false;return;}
+    if(!confirm('서버 데이터로 덮어씌울까요?'))return;
     D=parsed;sv();alert('다운로드 완료!');R();
   }catch(e){alert('오류: '+e.message);}
-  btn.textContent='📥 다운로드 (불러오기)';btn.disabled=false;
 }
 loadGH();
 function R(){
