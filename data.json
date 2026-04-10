@@ -164,7 +164,11 @@
     },
     "rb": 0,
     "mb": false,
-    "mr": 0
+    "mr": 0,
+    "sd": {
+      "sav_j": false,
+      "etf": false
+    }
   },
   "3": {
     "inc": {
@@ -337,7 +341,11 @@
     "rb": 0,
     "mb": false,
     "mr": 0,
-    "pd": 10
+    "pd": 10,
+    "sd": {
+      "sav_j": true,
+      "etf": true
+    }
   },
   "_ef": {
     "bal": 300000,
