@@ -177,59 +177,68 @@ function rInfo(){
   var h='<div class="title"><h1>👑 서율이네</h1><div class="sub">안내 · 동기화</div></div>';
   h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">📅 급여 주기</div><div style="font-size:13px;color:#c4b5d0;line-height:2"><div>급여일: 매월 <span style="color:#fbbf24;font-weight:700">'+PD+'일</span></div><div>한 주기: '+PD+'일 ~ 다음달 '+(PD-1)+'일</div><div>일예산 = (수입-고정지출-저축) ÷ 주기일수</div><div style="color:#f472b6;font-weight:700">초과 → 남은 예산÷남은 일수로 자동 감소</div><div style="color:#34d399;font-weight:700">절약 → 다음날 예산 증가</div></div></div>';
   h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">💰 보상</div><div style="font-size:13px;color:#c4b5d0;line-height:2"><div>🌟 무지출 → 예산의 8%</div><div>💖 50%+ 절약 → 절약액의 10%</div><div>✨ 30%+ → 7% · ⭐ 10%+ → 5%</div><div>❌ 초과 → 보상 없음 + 내일 예산↓</div><div>👑 월간 보스전 25일+ → 보상 1.5배</div></div></div>';
-  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">🔄 가족 동기화 (GitHub)</div>'
-    +'<div style="font-size:13px;color:#c4b5d0;margin-bottom:12px">두 폰에서 같은 데이터를 공유합니다</div>'
-    +'<div id="gh_status" style="margin-bottom:10px"></div>'
-    +'<div style="margin-bottom:10px">'
-    +'<div style="font-size:12px;color:#a78bbc;margin-bottom:4px">GitHub 설정 (최초 1회)</div>'
-    +'<input type="text" id="gh_user" placeholder="GitHub 아이디" value="'+(GH.user||'')+'" style="margin-bottom:6px;font-size:14px">'
-    +'<input type="text" id="gh_repo" placeholder="저장소 이름 (예: budget)" value="'+(GH.repo||'')+'" style="margin-bottom:6px;font-size:14px">'
-    +'<input type="text" id="gh_token" placeholder="Personal Access Token" value="'+(GH.token||'')+'" style="margin-bottom:6px;font-size:14px">'
-    +'<button onclick="saveGH()" style="width:100%;padding:10px;background:rgba(168,85,247,.15);color:#d8b4fe;border:1px solid rgba(168,85,247,.2);font-weight:700;margin-bottom:10px">설정 저장</button></div>'
-    +'<button onclick="uploadGH()" style="width:100%;padding:14px;margin-bottom:8px;background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700;font-size:15px">📤 업로드 (저장하기)</button>'
-    +'<button onclick="downloadGH()" style="width:100%;padding:14px;margin-bottom:8px;background:linear-gradient(135deg,#34d399,#2dd4bf);color:#1a1125;font-weight:700;font-size:15px">📥 다운로드 (불러오기)</button>'
-    +'<div style="font-size:11px;color:#555a6e;margin-top:6px;line-height:1.6">사용법: 지출 입력 후 업로드 → 상대방이 다운로드<br>Token 만들기: GitHub → Settings → Developer settings → Personal access tokens → Generate (repo 권한 체크)</div></div>';
+  h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">🔄 가족 동기화</div>'
+    +'<div style="font-size:13px;color:#c4b5d0;margin-bottom:12px">두 폰에서 같은 데이터를 공유합니다</div>';
+  if(!GH.token){
+    h+='<div style="padding:14px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.15);border-radius:14px;margin-bottom:12px">'
+      +'<div style="font-size:13px;font-weight:700;color:#fbbf24;margin-bottom:8px">최초 1회 토큰 등록</div>'
+      +'<div style="font-size:12px;color:#c4b5d0;line-height:1.8;margin-bottom:10px">'
+      +'1. GitHub 접속 → 우측 상단 프로필 클릭<br>'
+      +'2. Settings → 맨 아래 Developer settings<br>'
+      +'3. Personal access tokens → Tokens (classic)<br>'
+      +'4. Generate new token (classic)<br>'
+      +'5. Note: 서율이네 / Expiration: No expiration<br>'
+      +'6. <span style="color:#fbbf24;font-weight:700">repo 체크 ✓</span> → Generate token<br>'
+      +'7. 나온 토큰 복사해서 아래에 붙여넣기</div>'
+      +'<input type="text" id="gh_token" placeholder="ghp_xxxxx... 토큰 붙여넣기" style="margin-bottom:8px;font-size:14px">'
+      +'<button onclick="saveToken()" style="width:100%;padding:12px;background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700">토큰 등록하기</button></div>';
+  }else{
+    h+='<button onclick="uploadGH()" style="width:100%;padding:16px;margin-bottom:8px;background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700;font-size:16px">📤 업로드 (저장하기)</button>'
+      +'<button onclick="downloadGH()" style="width:100%;padding:16px;margin-bottom:8px;background:linear-gradient(135deg,#34d399,#2dd4bf);color:#1a1125;font-weight:700;font-size:16px">📥 다운로드 (불러오기)</button>'
+      +'<div style="display:flex;gap:8px;margin-top:4px">'
+      +'<button onclick="if(confirm(\'토큰을 삭제할까요?\')){GH.token=\'\';localStorage.setItem(\'syul_gh\',JSON.stringify(GH));R();}" style="flex:1;padding:8px;font-size:12px;color:#f472b6;background:rgba(244,114,182,.08)">토큰 초기화</button></div>';
+  }
+  h+='</div>';
   h+='<button style="width:100%;margin-top:12px;padding:12px;background:rgba(244,114,182,.08);color:#f472b6;border:1px solid rgba(244,114,182,.12)" onclick="if(confirm(\'전체 초기화?\')){D={};sv();R();}">전체 초기화</button>';return h;}
 var GH={};
 function loadGH(){try{var s=localStorage.getItem('syul_gh');if(s)GH=JSON.parse(s);else GH={};}catch(e){GH={};}}
-function saveGH(){
-  GH.user=document.getElementById('gh_user').value.trim();
-  GH.repo=document.getElementById('gh_repo').value.trim();
-  GH.token=document.getElementById('gh_token').value.trim();
+function saveToken(){
+  var t=document.getElementById('gh_token').value.trim();
+  if(!t){alert('토큰을 입력해주세요');return;}
+  GH.token=t;
   try{localStorage.setItem('syul_gh',JSON.stringify(GH));}catch(e){}
-  alert('GitHub 설정 저장 완료!');R();
+  alert('토큰 등록 완료! 이제 업로드/다운로드 가능합니다');R();
 }
-function ghOK(){return GH.user&&GH.repo&&GH.token;}
-function ghURL(){return'https://api.github.com/repos/'+GH.user+'/'+GH.repo+'/contents/data.json';}
+function ghURL(){return'https://api.github.com/repos/hn98201/budget/contents/data.json';}
 function ghHead(){return{'Authorization':'token '+GH.token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'};}
 
 async function uploadGH(){
-  if(!ghOK())return alert('GitHub 설정을 먼저 입력해주세요');
+  if(!GH.token)return alert('토큰을 먼저 등록해주세요');
   var btn=event.target;btn.textContent='업로드 중...';btn.disabled=true;
   try{
     var sha='';
     try{var r=await fetch(ghURL(),{headers:ghHead()});if(r.ok){var j=await r.json();sha=j.sha;}}catch(e){}
-    var body={message:'서율이네 가계부 '+new Date().toLocaleString('ko-KR'),content:btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2))))};
+    var body={message:'서율이네 '+new Date().toLocaleString('ko-KR'),content:btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2))))};
     if(sha)body.sha=sha;
     var r2=await fetch(ghURL(),{method:'PUT',headers:ghHead(),body:JSON.stringify(body)});
-    if(r2.ok)alert('업로드 완료! 상대방이 다운로드하면 동기화됩니다.');
-    else{var err=await r2.json();alert('업로드 실패: '+(err.message||r2.status));}
-  }catch(e){alert('업로드 오류: '+e.message);}
+    if(r2.ok)alert('업로드 완료!');
+    else{var err=await r2.json();alert('실패: '+(err.message||r2.status));}
+  }catch(e){alert('오류: '+e.message);}
   btn.textContent='📤 업로드 (저장하기)';btn.disabled=false;
 }
 
 async function downloadGH(){
-  if(!ghOK())return alert('GitHub 설정을 먼저 입력해주세요');
+  if(!GH.token)return alert('토큰을 먼저 등록해주세요');
   var btn=event.target;btn.textContent='다운로드 중...';btn.disabled=true;
   try{
     var r=await fetch(ghURL(),{headers:ghHead()});
-    if(!r.ok){alert('다운로드 실패: 데이터가 없거나 설정 오류');btn.textContent='📥 다운로드 (불러오기)';btn.disabled=false;return;}
+    if(!r.ok){alert('데이터가 없습니다. 먼저 업로드해주세요');btn.textContent='📥 다운로드 (불러오기)';btn.disabled=false;return;}
     var j=await r.json();
     var raw=decodeURIComponent(escape(atob(j.content.replace(/\n/g,''))));
     var parsed=JSON.parse(raw);
     if(!confirm('서버 데이터로 덮어씌울까요?')){btn.textContent='📥 다운로드 (불러오기)';btn.disabled=false;return;}
     D=parsed;sv();alert('다운로드 완료!');R();
-  }catch(e){alert('다운로드 오류: '+e.message);}
+  }catch(e){alert('오류: '+e.message);}
   btn.textContent='📥 다운로드 (불러오기)';btn.disabled=false;
 }
 loadGH();
