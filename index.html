@@ -78,7 +78,7 @@ function todayP(){var n=new Date();return d2p(n.getMonth(),n.getDate());}
 function dFull(m,d){return MN[m]+' '+d+'일';}
 function setPD(p,v){gP(p).pd=v;sv();R();}
 function dShort(m,d){return(m+1)+'/'+d;}
-(function(){var t=todayP();S.per=t.p;S.di=t.i;})();
+
 var DI=[{id:'sal_m',n:'마스터 월급',v:3300000},{id:'sal_j',n:'지은 월급',v:1600000},{id:'bonus',n:'상여금',v:1000000},{id:'gov',n:'부모급여',v:500000},{id:'child',n:'아동수당',v:100000}];
 var DF=[{id:'loan',n:'대출이자',v:556000},{id:'ins_m',n:'보험(마스터)',v:300000},{id:'ins_j',n:'보험(지은)',v:245000},{id:'ins_p',n:'보험(부모님)',v:200000},{id:'install_m',n:'할부(마스터)',v:174000},{id:'install_j',n:'할부(지은)',v:0},{id:'apt',n:'관리비',v:220000},{id:'comm_m',n:'통신비(마스터)',v:29000},{id:'comm_j',n:'통신비(지은)',v:17600},{id:'water',n:'정수기',v:20000},{id:'allow_m',n:'용돈(마스터)',v:450000},{id:'allow_j',n:'용돈(지은)',v:200000},{id:'social_m',n:'모임비(마스터)',v:60000},{id:'social_j',n:'모임비(지은)',v:30000}];
 var DS=[{id:'sav_j',n:'지은 적금',v:700000},{id:'etf',n:'ETF적립',v:400000},{id:'trade',n:'트레이딩',v:300000},{id:'emerg',n:'비상금',v:300000},{id:'travel',n:'여행비',v:50000}];
@@ -395,13 +395,12 @@ function R(){
   else if(S.scr==='emerg')c=rEmerg();
   else if(S.scr==='info')c=rInfo();
   else c=rDaily();
-  var tp=todayP();
   c+='<div class="nb">'
-    +'<button class="'+(S.scr==='daily'?'on':'')+'" onclick="S.scr=\'daily\';R()" style="font-size:10px">⚔️오늘</button>'
-    +'<button class="'+(S.scr==='month'?'on':'')+'" onclick="S.scr=\'month\';R()" style="font-size:10px">📊월간</button>'
+    +'<button class="'+(S.scr==='daily'?'on':'')+'" onclick="var _t=todayP();S.per=_t.p;S.di=_t.i;S.scr=\'daily\';R()" style="font-size:10px">⚔️오늘</button>'
+    +'<button class="'+(S.scr==='month'?'on':'')+'" onclick="var _t=todayP();S.per=_t.p;S.scr=\'month\';R()" style="font-size:10px">📊월간</button>'
     +'<button class="'+(S.scr==='asset'?'on':'')+'" onclick="S.scr=\'asset\';R()" style="font-size:10px">📈자산</button>'
     +'<button class="'+(S.scr==='emerg'?'on':'')+'" onclick="S.scr=\'emerg\';R()" style="font-size:10px">🆘비상</button>'
-    +'<button onclick="S.per='+tp.p+';S.di='+tp.i+';S.scr=\'daily\';R()" style="background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700;font-size:10px">TODAY</button>'
+    +'<button onclick="var _t=todayP();S.per=_t.p;S.di=_t.i;S.scr=\'daily\';R()" style="background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700;font-size:10px">TODAY</button>'
     +'<button class="'+(S.scr==='info'?'on':'')+'" onclick="S.scr=\'info\';R()" style="font-size:10px">💡</button></div>';
   document.getElementById('app').innerHTML=c;
   var n=document.getElementById('i_nm');if(n){document.getElementById('i_am').onkeydown=function(e){if(e.key==='Enter')addI();};n.onkeydown=function(e){if(e.key==='Enter')document.getElementById('i_am').focus();};}
@@ -417,7 +416,9 @@ function R(){
     }
   }
 }
-load();R();
+load();
+var _t=todayP();S.per=_t.p;S.di=_t.i;
+R();
 </script>
 </body>
 </html>
