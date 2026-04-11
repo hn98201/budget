@@ -178,12 +178,26 @@
     "sav": {},
     "days": {
       "0": {
-        "items": [],
-        "bt": false,
+        "items": [
+          {
+            "name": "외식",
+            "amount": 108000,
+            "cat": "기타",
+            "time": "오후 10:30"
+          }
+        ],
+        "bt": true,
         "rw": 0
       },
       "1": {
-        "items": [],
+        "items": [
+          {
+            "name": "아기용품-펜",
+            "amount": 533,
+            "cat": "육아",
+            "time": "오후 02:22"
+          }
+        ],
         "bt": false,
         "rw": 0
       },
