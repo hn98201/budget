@@ -97,7 +97,21 @@ function iP(){return{inc:{},fix:{},sav:{},days:{},rb:0,mb:false,mr:0};}
 function gP(p){if(!D[p])D[p]=iP();return D[p];}
 function gDy(p,i){var o=gP(p);if(!o.days[i])o.days[i]={items:[],bt:false,rw:0};return o.days[i];}
 function load(){try{var s=localStorage.getItem(SK);if(s)D=JSON.parse(s);else D={};}catch(e){D={};}}
-function sv(){try{localStorage.setItem(SK,JSON.stringify(D));}catch(e){}}
+function sv(){try{localStorage.setItem(SK,JSON.stringify(D));}catch(e){} autoUp();}
+var _upTimer=null;
+function autoUp(){if(!GH.token)return;clearTimeout(_upTimer);_upTimer=setTimeout(function(){
+  var sha='';
+  fetch(ghURL(),{headers:ghHead()}).then(function(r){return r.ok?r.json():null}).then(function(j){
+    if(j)sha=j.sha;
+    var body={message:'auto '+Date.now(),content:btoa(unescape(encodeURIComponent(JSON.stringify(D,null,2))))};
+    if(sha)body.sha=sha;
+    return fetch(ghURL(),{method:'PUT',headers:ghHead(),body:JSON.stringify(body)});
+  }).then(function(r){
+    var el=document.getElementById('sync_dot');
+    if(el)el.style.background=r&&r.ok?'#34d399':'#f87171';
+    setTimeout(function(){if(el)el.style.background='transparent';},1500);
+  }).catch(function(){});
+},2000);}
 function pI(p){var o=gP(p),t=0;DI.forEach(function(x){t+=Number(o.inc[x.id]||x.v)||0;});return t;}
 function pF(p){var o=gP(p),t=0;DF.forEach(function(x){t+=Number(o.fix[x.id]||x.v)||0;});return t;}
 function pS(p){var o=gP(p),t=0;DS.forEach(function(x){t+=Number(o.sav[x.id]||x.v)||0;});return t;}
@@ -149,7 +163,7 @@ function fMB(){var o=gP(S.per);o.mb=true;o.mr=S.bat.rw;o.rb=(o.rb||0)+S.bat.rw;s
 function rDaily(){
   var p=S.per,i=S.di,dy=gDy(p,i),dt=pDate(p,i),sp=dSp(p,i),db=dR(p,i),dbB=dB(p),sv2=db-sp,rw=cRw(sp,db);
   var x2=xp(),lv=gL(x2),nl=nL(x2),o=gP(p),bank=o.rb||0;
-  var h='<div class="title"><h1>👑 서율이네</h1><div class="sub">우리 가족 가계부 퀘스트</div></div>';
+  var h='<div class="title"><h1>👑 서율이네 <span id="sync_dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle;transition:background .3s"></span></h1><div class="sub">우리 가족 가계부 퀘스트</div></div>';
   h+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">'+hSvg(38)+'<div style="flex:1"><div style="font-size:15px;font-weight:700">Lv.'+lv.l+' '+lv.n+'</div><div style="font-size:11px;color:#a78bbc">XP '+x2+(nl?' / '+nl.x:' MAX')+' · ATK '+lv.a+'</div><div class="xpb" style="margin-top:4px"><div class="xpf" style="width:'+(nl?Math.min(100,(x2-lv.x)/(nl.x-lv.x)*100):100)+'%"></div></div></div></div>';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0 4px"><div class="mn" style="margin:0"><button onclick="chD(-1)"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M10 3L5 8L10 13" stroke="#a78bbc" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button><div style="text-align:center"><div style="font-size:18px;font-weight:800">'+dFull(dt.m,dt.d)+'</div></div><button onclick="chD(1)"><svg width="14" height="14" viewBox="0 0 16 16"><path d="M6 3L11 8L6 13" stroke="#a78bbc" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button></div>'+(dy.bt?'<span class="badge" style="background:rgba(52,211,153,.1);color:#34d399">CLEAR ✓</span>':'')+'</div>';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><span class="pl">'+pLbl(p)+' · '+(i+1)+'/'+pLen(p)+'일차</span><span style="font-size:11px;color:#555a6e">'+pRng(p)+'</span></div>';
@@ -207,25 +221,20 @@ function rInfo(){
   h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">📅 급여 주기</div><div style="font-size:13px;color:#c4b5d0;line-height:2"><div>급여일: 기본 <span style="color:#fbbf24;font-weight:700">12일</span> (월간 탭에서 변경)</div><div>주말·공휴일이면 해당 달만 바꾸세요</div><div>일예산 = (수입-고정지출-저축) ÷ 주기일수</div><div style="color:#f472b6;font-weight:700">초과 → 남은 예산÷남은 일수로 자동 감소</div><div style="color:#34d399;font-weight:700">절약 → 다음날 예산 증가</div></div></div>';
   h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">💰 보상</div><div style="font-size:13px;color:#c4b5d0;line-height:2"><div>🌟 무지출 → 예산의 8%</div><div>💖 50%+ 절약 → 절약액의 10%</div><div>✨ 30%+ → 7% · ⭐ 10%+ → 5%</div><div>❌ 초과 → 보상 없음 + 내일 예산↓</div><div>👑 월간 보스전 25일+ → 보상 1.5배</div></div></div>';
   h+='<div class="cd"><div style="font-size:14px;font-weight:700;margin-bottom:12px">🔄 가족 동기화</div>'
-    +'<div style="font-size:13px;color:#c4b5d0;margin-bottom:12px">두 폰에서 같은 데이터를 공유합니다</div>';
+    +'<div style="font-size:13px;color:#c4b5d0;margin-bottom:12px">데이터 입력 시 자동 저장됩니다</div>';
   if(!GH.token){
     h+='<div style="padding:14px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.15);border-radius:14px;margin-bottom:12px">'
-      +'<div style="font-size:13px;font-weight:700;color:#fbbf24;margin-bottom:8px">최초 1회 토큰 등록</div>'
-      +'<div style="font-size:12px;color:#c4b5d0;line-height:1.8;margin-bottom:10px">'
-      +'1. GitHub 접속 → 우측 상단 프로필 클릭<br>'
-      +'2. Settings → 맨 아래 Developer settings<br>'
-      +'3. Personal access tokens → Tokens (classic)<br>'
-      +'4. Generate new token (classic)<br>'
-      +'5. Note: 서율이네 / Expiration: No expiration<br>'
-      +'6. <span style="color:#fbbf24;font-weight:700">repo 체크 ✓</span> → Generate token<br>'
-      +'7. 나온 토큰 복사해서 아래에 붙여넣기</div>'
-      +'<input type="text" id="gh_token" placeholder="ghp_xxxxx... 토큰 붙여넣기" style="margin-bottom:8px;font-size:14px">'
-      +'<button onclick="saveToken()" style="width:100%;padding:12px;background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700">토큰 등록하기</button></div>';
+      +'<div style="font-size:13px;font-weight:700;color:#fbbf24;margin-bottom:8px">토큰 미등록 (오프라인 모드)</div>'
+      +'<div style="font-size:12px;color:#c4b5d0;line-height:1.8;margin-bottom:10px">시작화면에서 토큰을 등록하면<br>자동 동기화가 활성화됩니다</div></div>';
   }else{
-    h+='<button onclick="uploadGH()" style="width:100%;padding:16px;margin-bottom:8px;background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700;font-size:16px">📤 업로드 (저장하기)</button>'
-      +'<button onclick="downloadGH()" style="width:100%;padding:16px;margin-bottom:8px;background:linear-gradient(135deg,#34d399,#2dd4bf);color:#1a1125;font-weight:700;font-size:16px">📥 다운로드 (불러오기)</button>'
-      +'<div style="display:flex;gap:8px;margin-top:4px">'
-      +'<button onclick="if(confirm(\'토큰을 삭제할까요?\')){GH.token=\'\';localStorage.setItem(\'syul_gh\',JSON.stringify(GH));R();}" style="flex:1;padding:8px;font-size:12px;color:#f472b6;background:rgba(244,114,182,.08)">토큰 초기화</button></div>';
+    h+='<div style="padding:12px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.12);border-radius:14px;margin-bottom:12px;display:flex;align-items:center;gap:10px">'
+      +'<div style="width:10px;height:10px;border-radius:50%;background:#34d399;flex-shrink:0"></div>'
+      +'<div><div style="font-size:13px;font-weight:700;color:#34d399">자동 동기화 활성</div><div style="font-size:11px;color:#a78bbc">입력할 때마다 2초 후 자동 저장</div></div></div>'
+      +'<div style="font-size:12px;color:#a78bbc;margin-bottom:10px">수동 조작이 필요할 때:</div>'
+      +'<div style="display:flex;gap:8px;margin-bottom:8px">'
+      +'<button onclick="downloadGH()" style="flex:1;padding:12px;font-size:13px;font-weight:700;background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.15)">📥 수동 불러오기</button>'
+      +'<button onclick="uploadGH()" style="flex:1;padding:12px;font-size:13px;font-weight:700;background:rgba(168,85,247,.1);color:#d8b4fe;border:1px solid rgba(168,85,247,.15)">📤 수동 저장</button></div>'
+      +'<button onclick="if(confirm(\'토큰을 삭제할까요?\')){GH.token=\'\';localStorage.setItem(\'syul_gh\',JSON.stringify(GH));R();}" style="width:100%;padding:8px;font-size:12px;color:#f472b6;background:rgba(244,114,182,.08)">토큰 초기화</button>';
   }
   h+='</div>';
   h+='<button style="width:100%;margin-top:12px;padding:12px;background:rgba(244,114,182,.08);color:#f472b6;border:1px solid rgba(244,114,182,.12)" onclick="if(confirm(\'전체 초기화?\')){D={};sv();R();}">전체 초기화</button>';return h;}
@@ -236,7 +245,9 @@ function saveToken(){
   if(!t){alert('토큰을 입력해주세요');return;}
   GH.token=t;
   try{localStorage.setItem('syul_gh',JSON.stringify(GH));}catch(e){}
-  alert('토큰 등록 완료!');R();
+  alert('토큰 등록 완료!');
+  if(S.scr==='start')document.getElementById('app').innerHTML=rStart();
+  else R();
 }
 function ghURL(){return'https://api.github.com/repos/hn98201/budget/contents/data.json';}
 function ghHead(){return{'Authorization':'token '+GH.token.replace(/[^\x20-\x7E]/g,'').trim(),'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'};}
@@ -266,7 +277,6 @@ async function downloadGH(){
     D=parsed;sv();alert('다운로드 완료!');R();
   }catch(e){alert('오류: '+e.message);}
 }
-loadGH();
 
 // === Settings & Asset ===
 function getSet(){if(!D._set)D._set={start:'',target:100000000};return D._set;}
@@ -416,9 +426,50 @@ function R(){
     }
   }
 }
-load();
-var _t=todayP();S.per=_t.p;S.di=_t.i;
-R();
+function rStart(){
+  return '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;text-align:center;padding:20px">'
+    +'<div style="font-size:60px;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(251,191,36,.4))">👑</div>'
+    +'<div style="font-size:32px;font-weight:800;background:linear-gradient(135deg,#e879f9,#f9a8d4,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">서율이네</div>'
+    +'<div style="font-size:14px;color:#a78bbc;margin-bottom:40px">우리 가족 가계부 퀘스트</div>'
+    +'<button onclick="startApp()" style="width:100%;max-width:280px;padding:18px;font-size:18px;font-weight:700;background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;border-radius:99px;box-shadow:0 4px 20px rgba(168,85,247,.35);margin-bottom:16px">시작하기</button>'
+    +'<div id="start_msg" style="font-size:13px;color:#a78bbc;min-height:20px"></div>'
+    +(!GH.token?'<div style="margin-top:30px;padding:16px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.12);border-radius:16px;max-width:320px;text-align:left">'
+      +'<div style="font-size:13px;font-weight:700;color:#fbbf24;margin-bottom:8px">최초 1회 토큰 등록</div>'
+      +'<div style="font-size:12px;color:#c4b5d0;line-height:1.8;margin-bottom:10px">GitHub → Settings → Developer settings<br>→ Personal access tokens → Tokens (classic)<br>→ Generate new token → repo 체크 ✓</div>'
+      +'<input type="text" id="gh_token" placeholder="ghp_xxxxx... 토큰 붙여넣기" style="margin-bottom:8px;font-size:14px;width:100%">'
+      +'<button onclick="saveToken()" style="width:100%;padding:12px;background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;font-weight:700">토큰 등록</button></div>':'')
+    +'</div>';
+}
+
+async function startApp(){
+  var msg=document.getElementById('start_msg');
+  if(msg)msg.textContent='데이터 불러오는 중...';
+  if(GH.token){
+    try{
+      var r=await fetch(ghURL(),{headers:ghHead()});
+      if(r.ok){
+        var j=await r.json();
+        var raw=decodeURIComponent(escape(atob(j.content.replace(/\n/g,''))));
+        D=JSON.parse(raw);
+        try{localStorage.setItem(SK,JSON.stringify(D));}catch(e){}
+        if(msg)msg.textContent='동기화 완료!';
+      }else{
+        if(msg)msg.textContent='새로 시작합니다';
+      }
+    }catch(e){
+      if(msg)msg.textContent='오프라인 모드';
+    }
+  }
+  await new Promise(function(r){setTimeout(r,500)});
+  var _t=todayP();S.per=_t.p;S.di=_t.i;
+  S.scr='daily';S.started=true;R();
+}
+
+load();loadGH();
+// Show start screen
+S.scr='start';
+document.getElementById('app').innerHTML=rStart();
+
 </script>
 </body>
 </html>
