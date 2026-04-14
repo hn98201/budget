@@ -475,7 +475,7 @@
     "pd": 10,
     "sd": {
       "sav_j": true,
-      "etf": true
+      "etf": false
     }
   },
   "_ef": {
