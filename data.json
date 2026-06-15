@@ -1293,6 +1293,33 @@
     "mb": false,
     "mr": 0
   },
+  "5": {
+    "inc": {},
+    "fix": {},
+    "sav": {},
+    "days": {
+      "3": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "4": {
+        "items": [
+          {
+            "name": "기저귀",
+            "amount": 6800,
+            "cat": "육아",
+            "time": "오전 07:51"
+          }
+        ],
+        "bt": false,
+        "rw": 0
+      }
+    },
+    "rb": 0,
+    "mb": false,
+    "mr": 0
+  },
   "_ef": {
     "bal": 0,
     "log": [
