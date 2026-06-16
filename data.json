@@ -1298,6 +1298,28 @@
     "fix": {},
     "sav": {},
     "days": {
+      "0": {
+        "items": [
+          {
+            "name": "장보기",
+            "amount": 2300,
+            "cat": "식비",
+            "time": "오후 12:55"
+          }
+        ],
+        "bt": false,
+        "rw": 0
+      },
+      "1": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "2": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
       "3": {
         "items": [],
         "bt": false,
