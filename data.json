@@ -1436,6 +1436,11 @@
     "fix": {},
     "sav": {},
     "days": {
+      "0": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
       "1": {
         "items": [
           {
@@ -1477,11 +1482,159 @@
         ],
         "bt": false,
         "rw": 0
+      },
+      "3": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "4": {
+        "items": [
+          {
+            "name": "치약",
+            "amount": 3790,
+            "cat": "의료",
+            "time": "오전 11:55"
+          }
+        ],
+        "bt": false,
+        "rw": 0
+      },
+      "5": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "6": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "7": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "8": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "9": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "10": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "11": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "12": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "13": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "14": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "15": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "16": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "17": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "18": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "19": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "20": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "21": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "22": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "23": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "24": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "25": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "26": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "27": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "28": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "29": {
+        "items": [],
+        "bt": false,
+        "rw": 0
+      },
+      "30": {
+        "items": [],
+        "bt": false,
+        "rw": 0
       }
     },
     "rb": 0,
     "mb": false,
-    "mr": 0
+    "mr": 0,
+    "sd": {}
   },
   "_ef": {
     "bal": 0,
